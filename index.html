@@ -1,0 +1,2164 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Персонаж - Мой аккаунт</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #0a0a0a;
+            margin: 0;
+            min-height: 100vh;
+            overflow-x: hidden;
+            font-family: 'Arial', sans-serif;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 40px;
+        }
+        
+        .title {
+            color: white;
+            font-size: 2.5em;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .title span {
+            color: #ffcc00;
+        }
+        
+        .content-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 40px;
+            width: 100%;
+            justify-content: center;
+        }
+        
+        /* Блок навигации между страницами */
+        .navigation-panel {
+            background: rgba(20, 20, 20, 0.9);
+            border-radius: 15px;
+            padding: 25px;
+            width: 100%;
+            max-width: 1200px;
+            border: 1px solid rgba(255, 204, 0, 0.3);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            margin-bottom: 20px;
+        }
+        
+        .nav-title {
+            color: #ffcc00;
+            font-size: 1.3em;
+            margin-bottom: 20px;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .nav-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+        }
+        
+        .nav-card {
+            background: rgba(40, 40, 40, 0.8);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: white;
+        }
+        
+        .nav-card:hover {
+            transform: translateY(-5px);
+            border-color: #ffcc00;
+            box-shadow: 0 10px 20px rgba(255, 204, 0, 0.2);
+            background: rgba(50, 50, 50, 0.9);
+        }
+        
+        .nav-card.active {
+            border-color: #ffcc00;
+            background: rgba(255, 204, 0, 0.1);
+            box-shadow: 0 0 20px rgba(255, 204, 0, 0.3);
+        }
+        
+        .nav-card.admin-only {
+            position: relative;
+            border: 2px dashed rgba(255, 204, 0, 0.5);
+        }
+        
+        .admin-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: linear-gradient(135deg, #ff3333, #cc0000);
+            color: white;
+            font-size: 0.7em;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-weight: bold;
+            z-index: 2;
+        }
+        
+        .nav-icon {
+            font-size: 2em;
+            margin-bottom: 5px;
+        }
+        
+        .nav-card-title {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #ffcc00;
+        }
+        
+        .nav-card-desc {
+            font-size: 0.8em;
+            color: #aaa;
+            line-height: 1.3;
+        }
+        
+        .auth-box {
+            background: rgba(20, 20, 20, 0.8);
+            border-radius: 15px;
+            padding: 30px;
+            width: 100%;
+            max-width: 400px;
+            border: 1px solid rgba(255, 204, 0, 0.3);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        
+        .auth-title {
+            color: #ffcc00;
+            font-size: 1.5em;
+            margin-bottom: 25px;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #ffcc00;
+            font-size: 0.9em;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 204, 0, 0.3);
+            border-radius: 8px;
+            color: white;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #ffcc00;
+            box-shadow: 0 0 10px rgba(255, 204, 0, 0.2);
+        }
+        
+        .auth-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+        
+        .auth-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .login-btn {
+            background: #ffcc00;
+            color: black;
+        }
+        
+        .register-btn {
+            background: transparent;
+            color: #ffcc00;
+            border: 2px solid #ffcc00;
+        }
+        
+        .auth-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 204, 0, 0.3);
+        }
+        
+        .user-panel {
+            background: rgba(20, 20, 20, 0.8);
+            border-radius: 15px;
+            padding: 30px;
+            width: 100%;
+            max-width: 800px;
+            border: 1px solid rgba(255, 204, 0, 0.3);
+            backdrop-filter: blur(10px);
+            display: none;
+        }
+        
+        .user-panel.show {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .user-info {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        
+        .user-info h3 {
+            color: #ffcc00;
+            margin-bottom: 10px;
+        }
+        
+        .admin-badge-inline {
+            display: inline-block;
+            background: rgba(255, 204, 0, 0.2);
+            color: #ffcc00;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.8em;
+            margin-top: 5px;
+            border: 1px solid rgba(255, 204, 0, 0.3);
+        }
+        
+        .assistant-badge-inline {
+            display: inline-block;
+            background: rgba(76, 175, 80, 0.2);
+            color: #4CAF50;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.8em;
+            margin-top: 5px;
+            border: 1px solid rgba(76, 175, 80, 0.3);
+        }
+        
+        .user-stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #ffcc00;
+        }
+        
+        .stat-label {
+            font-size: 0.8em;
+            color: #aaa;
+        }
+        
+        /* Секция выбора персонажа */
+        .character-section {
+            margin-top: 30px;
+            border-top: 1px solid rgba(255, 204, 0, 0.3);
+            padding-top: 25px;
+        }
+        
+        .section-title {
+            color: #ffcc00;
+            font-size: 1.2em;
+            margin-bottom: 20px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .characters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .character-card {
+            background: rgba(30, 30, 30, 0.8);
+            border-radius: 10px;
+            padding: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .character-card:hover {
+            border-color: #ffcc00;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(255, 204, 0, 0.2);
+        }
+        
+        .character-card.selected {
+            border-color: #ffcc00;
+            background: rgba(255, 204, 0, 0.1);
+            box-shadow: 0 0 20px rgba(255, 204, 0, 0.3);
+        }
+        
+        .character-card.empty {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 150px;
+            color: #888;
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+        }
+        
+        .character-card.empty:hover {
+            border-color: #ffcc00;
+            color: #ffcc00;
+        }
+        
+        .empty-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+            opacity: 0.5;
+        }
+        
+        .character-preview {
+            width: 80px;
+            height: 100px;
+            background: rgba(0, 0, 0, 0.5);
+            margin: 0 auto 15px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5em;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .character-name {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 5px;
+            text-align: center;
+        }
+        
+        .character-details {
+            font-size: 0.8em;
+            color: #aaa;
+            text-align: center;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+        
+        .character-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 15px;
+        }
+        
+        .character-action-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .use-btn {
+            background: #ffcc00;
+            color: black;
+            font-weight: bold;
+        }
+        
+        .edit-btn {
+            background: rgba(52, 152, 219, 0.8);
+            color: white;
+        }
+        
+        .delete-btn {
+            background: rgba(231, 76, 60, 0.8);
+            color: white;
+        }
+        
+        .character-action-btn:hover {
+            transform: scale(1.05);
+        }
+        
+        .selected-character-info {
+            background: rgba(30, 30, 30, 0.8);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            border: 2px solid #ffcc00;
+            display: none;
+        }
+        
+        .selected-character-info.show {
+            display: block;
+            animation: slideIn 0.5s;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .selected-char-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .selected-char-title {
+            color: #ffcc00;
+            font-size: 1.2em;
+        }
+        
+        .selected-char-preview {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .selected-char-visual {
+            width: 120px;
+            height: 150px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3em;
+            border: 3px solid rgba(255, 204, 0, 0.5);
+        }
+        
+        .selected-char-stats {
+            flex: 1;
+        }
+        
+        .char-stat-row {
+            display: flex;
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .char-stat-name {
+            width: 120px;
+            color: #aaa;
+        }
+        
+        .char-stat-value {
+            color: white;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+        
+        .action-btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            text-decoration: none;
+        }
+        
+        .play-btn {
+            background: #ffcc00;
+            color: black;
+        }
+        
+        .edit-selected-btn {
+            background: rgba(52, 152, 219, 0.8);
+            color: white;
+        }
+        
+        .new-character-btn {
+            background: transparent;
+            color: #ffcc00;
+            border: 2px solid #ffcc00;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(255, 204, 0, 0.3);
+        }
+        
+        .logout-btn {
+            display: block;
+            width: 100%;
+            background: rgba(255, 50, 50, 0.2);
+            color: #ff6666;
+            border: 2px solid #ff6666;
+            padding: 12px;
+            margin-top: 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .logout-btn:hover {
+            background: rgba(255, 50, 50, 0.3);
+        }
+        
+        /* Консоль администратора и ассистента */
+        .admin-console {
+            background: rgba(10, 10, 30, 0.9);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 30px;
+            border: 2px solid rgba(255, 0, 0, 0.5);
+            display: none;
+        }
+        
+        .assistant-console {
+            border: 2px solid rgba(76, 175, 80, 0.5);
+        }
+        
+        .admin-console.show {
+            display: block;
+            animation: slideIn 0.5s;
+        }
+        
+        .console-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(255, 0, 0, 0.3);
+        }
+        
+        .assistant-console .console-header {
+            border-bottom: 2px solid rgba(76, 175, 80, 0.3);
+        }
+        
+        .console-title {
+            color: #ff3333;
+            font-size: 1.3em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .assistant-console .console-title {
+            color: #4CAF50;
+        }
+        
+        .console-title i {
+            font-size: 1.2em;
+        }
+        
+        .console-toggle {
+            background: transparent;
+            border: 1px solid #ff3333;
+            color: #ff3333;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+        
+        .assistant-console .console-toggle {
+            border: 1px solid #4CAF50;
+            color: #4CAF50;
+        }
+        
+        .console-toggle:hover {
+            background: rgba(255, 0, 0, 0.1);
+        }
+        
+        .assistant-console .console-toggle:hover {
+            background: rgba(76, 175, 80, 0.1);
+        }
+        
+        .console-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .console-btn {
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .console-btn.download {
+            background: linear-gradient(135deg, #4CAF50, #2E7D32);
+            color: white;
+        }
+        
+        .console-btn.upload {
+            background: linear-gradient(135deg, #2196F3, #0D47A1);
+            color: white;
+        }
+        
+        .console-btn.reset {
+            background: linear-gradient(135deg, #ff9800, #EF6C00);
+            color: white;
+        }
+        
+        .console-btn.admin-panel {
+            background: linear-gradient(135deg, #9C27B0, #673AB7);
+            color: white;
+        }
+        
+        .console-btn.delete-all {
+            background: linear-gradient(135deg, #f44336, #C62828);
+            color: white;
+        }
+        
+        .console-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .console-info {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .console-info pre {
+            margin: 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            color: #00ff00;
+        }
+        
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            width: 100%;
+        }
+        
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        
+        .console-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .console-stat {
+            text-align: center;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+        }
+        
+        .console-stat-value {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #ffcc00;
+        }
+        
+        .console-stat-label {
+            font-size: 0.8em;
+            color: #aaa;
+            margin-top: 5px;
+        }
+        
+        .message {
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: center;
+            display: none;
+        }
+        
+        .message.success {
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            color: #0f0;
+            display: block;
+        }
+        
+        .message.error {
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px solid rgba(255, 0, 0, 0.3);
+            color: #f00;
+            display: block;
+        }
+        
+        .message.info {
+            background: rgba(0, 150, 255, 0.1);
+            border: 1px solid rgba(0, 150, 255, 0.3);
+            color: #00aaff;
+            display: block;
+        }
+        
+        /* Анимированный фон */
+        .bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(255, 204, 0, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(255, 204, 0, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 40% 80%, rgba(255, 204, 0, 0.05) 0%, transparent 50%);
+            animation: pulse-bg 8s ease-in-out infinite alternate;
+        }
+        
+        @keyframes pulse-bg {
+            0% {
+                opacity: 0.3;
+            }
+            100% {
+                opacity: 0.7;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .title {
+                font-size: 2em;
+            }
+            
+            .nav-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .characters-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .selected-char-preview {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .selected-char-stats {
+                width: 100%;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .console-controls {
+                grid-template-columns: 1fr;
+            }
+            
+            .console-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .nav-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="bg"></div>
+    
+    <div class="container">
+        <h1 class="title">Мой <span>аккаунт</span> и персонажи</h1>
+        
+        <!-- Блок навигации между страницами -->
+        <div class="navigation-panel">
+            <h3 class="nav-title">
+                <i class="fas fa-compass"></i> Навигация по сайту
+            </h3>
+            
+            <div id="navGrid" class="nav-grid">
+                <!-- Навигация будет динамически генерироваться в зависимости от прав пользователя -->
+            </div>
+        </div>
+        
+        <div class="content-wrapper">
+            <div id="authForm" class="auth-box">
+                <h2 class="auth-title">Регистрация и вход</h2>
+                
+                <div class="form-group">
+                    <label for="username">👤 Логин:</label>
+                    <input type="text" id="username" placeholder="Введите логин" autocomplete="username">
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">🔒 Пароль:</label>
+                    <input type="password" id="password" placeholder="Введите пароль" autocomplete="current-password">
+                </div>
+                
+                <div id="message" class="message"></div>
+                
+                <div class="auth-buttons">
+                    <button class="auth-btn login-btn" onclick="login()">
+                        Войти
+                    </button>
+                    <button class="auth-btn register-btn" onclick="register()">
+                        Регистрация
+                    </button>
+                </div>
+            </div>
+            
+            <div id="userPanel" class="user-panel">
+                <div class="user-info">
+                    <h3>Добро пожаловать!</h3>
+                    <p>Вы вошли как: <strong id="currentUser">Пользователь</strong></p>
+                    <div id="adminBadge" class="admin-badge-inline" style="display: none;">👑 Администратор</div>
+                    <div id="assistantBadge" class="assistant-badge-inline" style="display: none;">🛠️ Ассистент</div>
+                    
+                    <div class="user-stats">
+                        <div class="stat-item">
+                            <div class="stat-value" id="userId">0</div>
+                            <div class="stat-label">ID</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="charCount">0</div>
+                            <div class="stat-label">Персонажей</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="createdDate">-</div>
+                            <div class="stat-label">Аккаунт создан</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Секция выбора персонажа -->
+                <div class="character-section">
+                    <h3 class="section-title">
+                        <span>👤</span> Мои персонажи
+                    </h3>
+                    
+                    <div id="charactersList" class="characters-grid">
+                        <!-- Персонажи будут загружены здесь -->
+                    </div>
+                    
+                    <div id="selectedCharacterInfo" class="selected-character-info">
+                        <div class="selected-char-header">
+                            <div class="selected-char-title">Выбранный персонаж</div>
+                            <button class="character-action-btn delete-btn" onclick="deselectCharacter()">
+                                ✕ Отменить выбор
+                            </button>
+                        </div>
+                        
+                        <div class="selected-char-preview">
+                            <div id="selectedCharVisual" class="selected-char-visual">
+                                👤
+                            </div>
+                            <div class="selected-char-stats">
+                                <div class="char-stat-row">
+                                    <div class="char-stat-name">Имя:</div>
+                                    <div class="char-stat-value" id="selectedCharName">-</div>
+                                </div>
+                                <div class="char-stat-row">
+                                    <div class="char-stat-name">Внешность:</div>
+                                    <div class="char-stat-value" id="selectedCharAppearance">-</div>
+                                </div>
+                                <div class="char-stat-row">
+                                    <div class="char-stat-name">Одежда:</div>
+                                    <div class="char-stat-value" id="selectedCharClothes">-</div>
+                                </div>
+                                <div class="char-stat-row">
+                                    <div class="char-stat-name">Создан:</div>
+                                    <div class="char-stat-value" id="selectedCharCreated">-</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="action-buttons">
+                            <button class="action-btn play-btn" onclick="playWithSelectedCharacter()">
+                                🎮 Играть с этим персонажем
+                            </button>
+                            <button class="action-btn new-character-btn" onclick="createNewCharacter()">
+                                ➕ Создать нового персонажа
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Консоль администратора/ассистента -->
+                <div id="adminConsole" class="admin-console">
+                    <div class="console-header">
+                        <div class="console-title">
+                            <i class="fas fa-terminal"></i> <span id="consoleTitle">Консоль администратора</span>
+                        </div>
+                        <button class="console-toggle" onclick="toggleConsole()">
+                            <i class="fas fa-chevron-up"></i> Свернуть
+                        </button>
+                    </div>
+                    
+                    <div class="console-controls">
+                        <button class="console-btn download" onclick="downloadDatabase()">
+                            <i class="fas fa-download"></i> Скачать базу данных
+                        </button>
+                        
+                        <div class="file-input-wrapper">
+                            <button class="console-btn upload">
+                                <i class="fas fa-upload"></i> Загрузить базу данных
+                            </button>
+                            <input type="file" id="databaseUpload" accept=".json" onchange="uploadDatabase(event)">
+                        </div>
+                        
+                        <button class="console-btn admin-panel" onclick="goToAdminPanel()">
+                            <i class="fas fa-cogs"></i> Перейти в админ-панель
+                        </button>
+                        
+                        <button class="console-btn delete-all" onclick="deleteAllUsers()">
+                            <i class="fas fa-trash"></i> Удалить всех пользователей
+                        </button>
+                    </div>
+                    
+                    <div class="console-stats">
+                        <div class="console-stat">
+                            <div class="console-stat-value" id="consoleUserCount">0</div>
+                            <div class="console-stat-label">Пользователей</div>
+                        </div>
+                        <div class="console-stat">
+                            <div class="console-stat-value" id="consoleCharCount">0</div>
+                            <div class="console-stat-label">Персонажей</div>
+                        </div>
+                        <div class="console-stat">
+                            <div class="console-stat-value" id="consoleDbSize">0 KB</div>
+                            <div class="console-stat-label">Размер базы</div>
+                        </div>
+                        <div class="console-stat">
+                            <div class="console-stat-value" id="consoleLastBackup">-</div>
+                            <div class="console-stat-label">Последний бэкап</div>
+                        </div>
+                    </div>
+                    
+                    <div class="console-info">
+                        <pre id="consoleOutput">Консоль готова к работе. Выберите действие.</pre>
+                    </div>
+                </div>
+                
+                <div class="action-buttons" style="margin-top: 20px;">
+                    <button id="adminConsoleBtn" class="action-btn" onclick="showAdminConsole()" style="background: rgba(255, 0, 0, 0.2); color: #ff3333; border: 2px solid #ff3333; display: none;">
+                        <i class="fas fa-terminal"></i> <span id="consoleBtnText">Админ консоль</span>
+                    </button>
+                </div>
+                
+                <button class="logout-btn" onclick="logout()">
+                    ← Выйти из аккаунта
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===== СИСТЕМА БАЗЫ ДАННЫХ =====
+        
+        class UserDatabase {
+            constructor() {
+                this.dbName = 'character_creator_db';
+                this.init();
+            }
+            
+            init() {
+                if (!localStorage.getItem(this.dbName)) {
+                    const initialData = {
+                        users: [
+                            {
+                                id: 1,
+                                username: 'admin',
+                                password: 'admin1dfsgadfhwetrW4T3254YURTJ',
+                                created: new Date().toISOString(),
+                                lastLogin: new Date().toISOString(),
+                                loginCount: 1,
+                                isAdmin: true,
+                                isAssistant: false
+                            }
+                        ],
+                        nextId: 2,
+                        characters: [
+                            {
+                                id: 1,
+                                userId: 1,
+                                name: "Герой Админ",
+                                face: "Улыбающееся",
+                                skin: "Светлый",
+                                hair: "Прямые",
+                                hairColor: "Коричневый",
+                                clothes: "Доспехи",
+                                clothesColor: "Золотой",
+                                accessory: "Нет",
+                                created: new Date().toISOString(),
+                            }
+                        ],
+                        nextCharId: 2
+                    };
+                    localStorage.setItem(this.dbName, JSON.stringify(initialData));
+                }
+            }
+            
+            // Регистрация пользователя
+            registerUser(username, password) {
+                const db = JSON.parse(localStorage.getItem(this.dbName));
+                
+                const existingUser = db.users.find(user => user.username === username);
+                if (existingUser) {
+                    return { success: false, message: 'Пользователь уже существует' };
+                }
+                
+                const newUser = {
+                    id: db.nextId++,
+                    username: username,
+                    password: password,
+                    created: new Date().toISOString(),
+                    lastLogin: new Date().toISOString(),
+                    loginCount: 1,
+                    isAdmin: false,
+                    isAssistant: false
+                };
+                
+                db.users.push(newUser);
+                localStorage.setItem(this.dbName, JSON.stringify(db));
+                
+                return { 
+                    success: true, 
+                    message: 'Регистрация успешна!',
+                    user: { 
+                        id: newUser.id, 
+                        username: newUser.username,
+                        created: newUser.created,
+                        loginCount: newUser.loginCount,
+                        isAdmin: false,
+                        isAssistant: false
+                    }
+                };
+            }
+            
+            // Авторизация пользователя
+            loginUser(username, password) {
+                const db = JSON.parse(localStorage.getItem(this.dbName));
+                const user = db.users.find(u => u.username === username && u.password === password);
+                
+                if (user) {
+                    user.lastLogin = new Date().toISOString();
+                    user.loginCount = (user.loginCount || 0) + 1;
+                    localStorage.setItem(this.dbName, JSON.stringify(db));
+                    
+                    return { 
+                        success: true, 
+                        user: { 
+                            id: user.id, 
+                            username: user.username,
+                            created: user.created,
+                            loginCount: user.loginCount,
+                            isAdmin: user.isAdmin || false,
+                            isAssistant: user.isAssistant || false
+                        }
+                    };
+                } else {
+                    return { 
+                        success: false, 
+                        message: 'Неверный логин или пароль' 
+                    };
+                }
+            }
+            
+            // Получить пользователя по ID
+            getUserById(userId) {
+                const db = JSON.parse(localStorage.getItem(this.dbName));
+                const user = db.users.find(u => u.id === userId);
+                
+                if (user) {
+                    return { 
+                        success: true, 
+                        user: { 
+                            id: user.id, 
+                            username: user.username,
+                            created: user.created,
+                            loginCount: user.loginCount || 1,
+                            isAdmin: user.isAdmin || false,
+                            isAssistant: user.isAssistant || false
+                        }
+                    };
+                } else {
+                    return { 
+                        success: false, 
+                        message: 'Пользователь не найден' 
+                    };
+                }
+            }
+            
+            // ===== СИСТЕМА ПЕРСОНАЖЕЙ =====
+            
+            // Получить всех персонажей пользователя
+            getUserCharacters(userId) {
+                const db = JSON.parse(localStorage.getItem(this.dbName) || '{"characters":[]}');
+                const characters = db.characters?.filter(char => char.userId === userId) || [];
+                
+                return characters.sort((a, b) => new Date(b.created) - new Date(a.created));
+            }
+            
+            // Получить количество персонажей пользователя
+            getUserCharacterCount(userId) {
+                const characters = this.getUserCharacters(userId);
+                return characters.length;
+            }
+            
+            // Получить персонажа по ID
+            getCharacterById(charId) {
+                const db = JSON.parse(localStorage.getItem(this.dbName) || '{"characters":[]}');
+                const character = db.characters?.find(char => char.id === charId);
+                
+                if (character) {
+                    return { success: true, character: character };
+                } else {
+                    return { success: false, message: 'Персонаж не найден' };
+                }
+            }
+            
+            // Создать нового персонажа
+            createCharacter(userId, characterData) {
+                const db = JSON.parse(localStorage.getItem(this.dbName));
+                
+                // Генерируем уникальный ID для персонажа
+                const newCharId = db.nextCharId++;
+                
+                const newCharacter = {
+                    id: newCharId,
+                    userId: userId,
+                    name: characterData.name,
+                    face: characterData.face,
+                    skin: characterData.skin,
+                    hair: characterData.hair,
+                    hairColor: characterData.hairColor,
+                    clothes: characterData.clothes,
+                    clothesColor: characterData.clothesColor,
+                    accessory: characterData.accessory,
+                    config: characterData.config || {},
+                    created: new Date().toISOString(),
+                };
+                
+                if (!db.characters) db.characters = [];
+                db.characters.push(newCharacter);
+                localStorage.setItem(this.dbName, JSON.stringify(db));
+                
+                return { 
+                    success: true, 
+                    message: 'Персонаж создан!',
+                    character: newCharacter 
+                };
+            }
+            
+            // Обновить персонажа
+            updateCharacter(charId, characterData) {
+                const db = JSON.parse(localStorage.getItem(this.dbName));
+                const charIndex = db.characters?.findIndex(char => char.id === charId);
+                
+                if (charIndex === -1 || charIndex === undefined) {
+                    return { success: false, message: 'Персонаж не найден' };
+                }
+                
+                db.characters[charIndex] = {
+                    ...db.characters[charIndex],
+                    ...characterData,
+                    updated: new Date().toISOString()
+                };
+                
+                localStorage.setItem(this.dbName, JSON.stringify(db));
+                
+                return { 
+                    success: true, 
+                    message: 'Персонаж обновлен!',
+                    character: db.characters[charIndex]
+                };
+            }
+            
+            // Удалить персонажа
+            deleteCharacter(charId) {
+                const db = JSON.parse(localStorage.getItem(this.dbName));
+                const charIndex = db.characters?.findIndex(char => char.id === charId);
+                
+                if (charIndex === -1 || charIndex === undefined) {
+                    return { success: false, message: 'Персонаж не найден' };
+                }
+                
+                const deletedChar = db.characters[charIndex];
+                db.characters.splice(charIndex, 1);
+                localStorage.setItem(this.dbName, JSON.stringify(db));
+                
+                return { 
+                    success: true, 
+                    message: 'Персонаж удален!',
+                    character: deletedChar
+                };
+            }
+            
+            // Получить выбранного персонажа пользователя
+            getUserSelectedCharacter(userId) {
+                const selectedCharId = localStorage.getItem(`selected_char_${userId}`);
+                if (selectedCharId) {
+                    return this.getCharacterById(parseInt(selectedCharId));
+                }
+                return { success: false, message: 'Персонаж не выбран' };
+            }
+            
+            // Установить выбранного персонажа
+            setUserSelectedCharacter(userId, charId) {
+                localStorage.setItem(`selected_char_${userId}`, charId);
+                return { success: true };
+            }
+            
+            // Очистить выбранного персонажа
+            clearUserSelectedCharacter(userId) {
+                localStorage.removeItem(`selected_char_${userId}`);
+                return { success: true };
+            }
+            
+            // ===== АДМИНИСТРАТИВНЫЕ ФУНКЦИИ =====
+            
+            // Получить всю базу данных
+            getDatabase() {
+                return JSON.parse(localStorage.getItem(this.dbName) || '{"users":[], "characters":[], "nextId": 1, "nextCharId": 1}');
+            }
+            
+            // Экспорт базы данных в JSON
+            exportDatabase() {
+                const db = this.getDatabase();
+                return JSON.stringify(db, null, 2);
+            }
+            
+            // Импорт базы данных из JSON
+            importDatabase(jsonData) {
+                try {
+                    const newDb = JSON.parse(jsonData);
+                    
+                    // Проверяем структуру данных
+                    if (!newDb.users || !newDb.characters || newDb.nextId === undefined || newDb.nextCharId === undefined) {
+                        return { success: false, message: 'Неверный формат базы данных' };
+                    }
+                    
+                    localStorage.setItem(this.dbName, JSON.stringify(newDb));
+                    
+                    // Сохраняем время последнего бэкапа
+                    localStorage.setItem('last_backup_time', new Date().toISOString());
+                    
+                    return { 
+                        success: true, 
+                        message: 'База данных успешно загружена!',
+                        stats: {
+                            users: newDb.users.length,
+                            characters: newDb.characters.length
+                        }
+                    };
+                } catch (error) {
+                    return { 
+                        success: false, 
+                        message: 'Ошибка при загрузке файла: ' + error.message 
+                    };
+                }
+            }
+            
+            // Сброс базы данных к начальному состоянию
+            resetDatabase() {
+                localStorage.removeItem(this.dbName);
+                this.init();
+                
+                // Удаляем все связанные данные
+                const keysToRemove = [];
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    if (key.startsWith('selected_char_') || 
+                        key === 'currentUser' || 
+                        key === 'activeCharacter' ||
+                        key === 'newlyCreatedCharacter') {
+                        keysToRemove.push(key);
+                    }
+                }
+                
+                keysToRemove.forEach(key => localStorage.removeItem(key));
+                
+                return { 
+                    success: true, 
+                    message: 'База данных сброшена к начальному состоянию!' 
+                };
+            }
+            
+            // Удалить всех пользователей (кроме администратора)
+            deleteAllUsers() {
+                const db = this.getDatabase();
+                
+                // Сохраняем администратора и ассистентов
+                const adminUsers = db.users.filter(u => u.username === 'admin' || u.isAdmin || u.isAssistant);
+                
+                // Сбрасываем базу данных
+                db.users = adminUsers;
+                db.nextId = Math.max(...adminUsers.map(u => u.id)) + 1;
+                db.characters = db.characters.filter(char => adminUsers.some(u => u.id === char.userId));
+                db.nextCharId = db.characters.length > 0 ? Math.max(...db.characters.map(c => c.id)) + 1 : 1;
+                
+                localStorage.setItem(this.dbName, JSON.stringify(db));
+                
+                // Удаляем связанные данные
+                const keysToRemove = [];
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    if (key.startsWith('selected_char_') || 
+                        key === 'currentUser' || 
+                        key === 'activeCharacter' ||
+                        key === 'newlyCreatedCharacter') {
+                        keysToRemove.push(key);
+                    }
+                }
+                
+                keysToRemove.forEach(key => {
+                    // Не удаляем выбор администратора и ассистентов
+                    const userId = key.replace('selected_char_', '');
+                    if (userId && !adminUsers.some(u => u.id === parseInt(userId))) {
+                        localStorage.removeItem(key);
+                    }
+                });
+                
+                return { 
+                    success: true, 
+                    message: 'Все пользователи удалены (кроме администраторов и ассистентов)!',
+                    stats: {
+                        users: db.users.length,
+                        characters: db.characters.length
+                    }
+                };
+            }
+            
+            // Получить статистику базы данных
+            getDatabaseStats() {
+                const db = this.getDatabase();
+                const dbSize = JSON.stringify(db).length;
+                
+                return {
+                    users: db.users.length,
+                    characters: db.characters.length,
+                    dbSize: (dbSize / 1024).toFixed(2) + ' KB',
+                    lastBackup: localStorage.getItem('last_backup_time') || 'Никогда'
+                };
+            }
+            
+            // Создать резервную копию с временной меткой
+            createBackup() {
+                const db = this.getDatabase();
+                const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+                const backupKey = `backup_${timestamp}`;
+                
+                localStorage.setItem(backupKey, JSON.stringify(db));
+                
+                // Ограничиваем количество бэкапов (храним последние 5)
+                const backups = [];
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    if (key.startsWith('backup_')) {
+                        backups.push(key);
+                    }
+                }
+                
+                if (backups.length > 5) {
+                    backups.sort();
+                    for (let i = 0; i < backups.length - 5; i++) {
+                        localStorage.removeItem(backups[i]);
+                    }
+                }
+                
+                return { 
+                    success: true, 
+                    message: 'Резервная копия создана!',
+                    backupKey: backupKey
+                };
+            }
+            
+            // Восстановить из резервной копии
+            restoreBackup(backupKey) {
+                const backup = localStorage.getItem(backupKey);
+                if (!backup) {
+                    return { success: false, message: 'Резервная копия не найдена' };
+                }
+                
+                return this.importDatabase(backup);
+            }
+            
+            // Получить список резервных копий
+            getBackups() {
+                const backups = [];
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    if (key.startsWith('backup_')) {
+                        const timestamp = key.replace('backup_', '').replace(/-/g, ':').replace('T', ' ');
+                        backups.push({
+                            key: key,
+                            timestamp: timestamp.substring(0, timestamp.length - 1)
+                        });
+                    }
+                }
+                
+                return backups.sort((a, b) => b.timestamp.localeCompare(a.timestamp));
+            }
+        }
+        
+        // ===== УПРАВЛЕНИЕ ИНТЕРФЕЙСОМ =====
+        
+        const db = new UserDatabase();
+        let currentUser = null;
+        let selectedCharacter = null;
+        let isConsoleVisible = false;
+        
+        function showMessage(text, type) {
+            const messageEl = document.getElementById('message');
+            messageEl.textContent = text;
+            messageEl.className = `message ${type}`;
+            
+            setTimeout(() => {
+                messageEl.className = 'message';
+            }, 3000);
+        }
+        
+        function showConsoleMessage(text, type = 'info') {
+            const consoleEl = document.getElementById('consoleOutput');
+            const timestamp = new Date().toLocaleTimeString();
+            let color = '#00ff00';
+            
+            switch(type) {
+                case 'error': color = '#ff3333'; break;
+                case 'warning': color = '#ff9900'; break;
+                case 'info': color = '#00aaff'; break;
+                case 'success': color = '#00ff00'; break;
+            }
+            
+            consoleEl.innerHTML = `<span style="color: #888">[${timestamp}]</span> <span style="color: ${color}">${text}</span>\n` + consoleEl.innerHTML;
+        }
+        
+        function updateNavigationPanel(isAdminOrAssistant = false) {
+            const navGrid = document.getElementById('navGrid');
+            
+            const navItems = [
+                {
+                    href: 'index.html',
+                    icon: '👤',
+                    title: 'Мой аккаунт',
+                    desc: 'Управление профилем и персонажами',
+                    isActive: true,
+                    isAdminOnly: false
+                },
+                {
+                    href: 'create-character.html',
+                    icon: '🎨',
+                    title: 'Создание персонажа',
+                    desc: 'Создание и редактирование персонажей',
+                    isActive: false,
+                    isAdminOnly: false
+                },
+                {
+                    href: 'game-world.html',
+                    icon: '🎮',
+                    title: 'Игровой мир',
+                    desc: 'Приключения с вашим персонажем',
+                    isActive: false,
+                    isAdminOnly: false
+                },
+                {
+                    href: 'admin-panel.html',
+                    icon: '👑',
+                    title: 'Админ панель',
+                    desc: 'Управление системой (админам и ассистентам)',
+                    isActive: false,
+                    isAdminOnly: true
+                },
+            ];
+            
+            navGrid.innerHTML = '';
+            
+            navItems.forEach(item => {
+                // Показываем админ-панель для администраторов и ассистентов
+                if (item.isAdminOnly && !isAdminOrAssistant) {
+                    return;
+                }
+                
+                const navCard = document.createElement('a');
+                navCard.href = item.href;
+                navCard.className = `nav-card ${item.isActive ? 'active' : ''} ${item.isAdminOnly ? 'admin-only' : ''}`;
+                
+                let badge = '';
+                if (item.isAdminOnly) {
+                    badge = '<div class="admin-badge">ADMIN/ASSISTANT</div>';
+                }
+                
+                navCard.innerHTML = `
+                    ${badge}
+                    <div class="nav-icon">${item.icon}</div>
+                    <div class="nav-card-title">${item.title}</div>
+                    <div class="nav-card-desc">${item.desc}</div>
+                `;
+                
+                navGrid.appendChild(navCard);
+            });
+        }
+        
+        function showUserPanel(user) {
+            currentUser = user;
+            
+            // Обновляем информацию пользователя
+            document.getElementById('currentUser').textContent = user.username;
+            document.getElementById('userId').textContent = user.id;
+            
+            // Получаем и отображаем количество персонажей
+            const charCount = db.getUserCharacterCount(user.id);
+            document.getElementById('charCount').textContent = charCount;
+            
+            // Форматируем дату создания
+            const createdDate = new Date(user.created);
+            document.getElementById('createdDate').textContent = createdDate.toLocaleDateString();
+            
+            // Показываем бейдж администратора или ассистента
+            const adminBadge = document.getElementById('adminBadge');
+            const assistantBadge = document.getElementById('assistantBadge');
+            const adminConsoleBtn = document.getElementById('adminConsoleBtn');
+            const consoleTitle = document.getElementById('consoleTitle');
+            const consoleBtnText = document.getElementById('consoleBtnText');
+            const consoleEl = document.getElementById('adminConsole');
+            
+            if (user.isAdmin) {
+                adminBadge.style.display = 'inline-block';
+                assistantBadge.style.display = 'none';
+                adminConsoleBtn.style.display = 'block';
+                adminConsoleBtn.style.background = 'rgba(255, 0, 0, 0.2)';
+                adminConsoleBtn.style.color = '#ff3333';
+                adminConsoleBtn.style.border = '2px solid #ff3333';
+                consoleBtnText.textContent = 'Админ консоль';
+                consoleTitle.textContent = 'Консоль администратора';
+                consoleEl.classList.remove('assistant-console');
+                
+                // Обновляем навигационную панель для администратора
+                updateNavigationPanel(true);
+                // Показываем консоль администратора
+                showAdminConsole();
+            } else if (user.isAssistant) {
+                adminBadge.style.display = 'none';
+                assistantBadge.style.display = 'inline-block';
+                adminConsoleBtn.style.display = 'block';
+                adminConsoleBtn.style.background = 'rgba(76, 175, 80, 0.2)';
+                adminConsoleBtn.style.color = '#4CAF50';
+                adminConsoleBtn.style.border = '2px solid #4CAF50';
+                consoleBtnText.textContent = 'Консоль ассистента';
+                consoleTitle.textContent = 'Консоль ассистента';
+                consoleEl.classList.add('assistant-console');
+                
+                // Обновляем навигационную панель для ассистента
+                updateNavigationPanel(true);
+                // Показываем консоль ассистента
+                showAdminConsole();
+            } else {
+                adminBadge.style.display = 'none';
+                assistantBadge.style.display = 'none';
+                adminConsoleBtn.style.display = 'none';
+                // Обновляем навигационную панель для обычного пользователя
+                updateNavigationPanel(false);
+                // Скрываем консоль для обычных пользователей
+                consoleEl.style.display = 'none';
+            }
+            
+            // Переключаем видимость панелей
+            document.getElementById('userPanel').classList.add('show');
+            document.getElementById('authForm').style.display = 'none';
+            
+            // Загружаем персонажей пользователя
+            loadUserCharacters();
+            
+            // Загружаем выбранного персонажа
+            loadSelectedCharacter();
+            
+            // Сохраняем информацию о текущем пользователе
+            localStorage.setItem('currentUser', JSON.stringify(user));
+            
+            // Обновляем статистику в консоли
+            updateConsoleStats();
+        }
+        
+        function hideUserPanel() {
+            document.getElementById('userPanel').classList.remove('show');
+            document.getElementById('authForm').style.display = 'block';
+            localStorage.removeItem('currentUser');
+            currentUser = null;
+            selectedCharacter = null;
+            isConsoleVisible = false;
+            
+            // Обновляем навигационную панель для неавторизованных пользователей
+            updateNavigationPanel(false);
+        }
+        
+        function login() {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            
+            if (!username || !password) {
+                showMessage('Заполните все поля', 'error');
+                return;
+            }
+            
+            const result = db.loginUser(username, password);
+            
+            if (result.success) {
+                showMessage('✅ Вход выполнен успешно!', 'success');
+                showUserPanel(result.user);
+            } else {
+                showMessage(`❌ ${result.message}`, 'error');
+            }
+        }
+        
+        function register() {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            
+            if (!username || !password) {
+                showMessage('Заполните все поля', 'error');
+                return;
+            }
+            
+            if (username.length < 3) {
+                showMessage('Логин должен быть не менее 3 символов', 'error');
+                return;
+            }
+            
+            if (password.length < 4) {
+                showMessage('Пароль должен быть не менее 4 символов', 'error');
+                return;
+            }
+            
+            const result = db.registerUser(username, password);
+            
+            if (result.success) {
+                showMessage(`✅ ${result.message}`, 'success');
+                // Очищаем поля после успешной регистрации
+                document.getElementById('username').value = '';
+                document.getElementById('password').value = '';
+                
+                // Автоматически входим после регистрации
+                setTimeout(() => {
+                    showUserPanel(result.user);
+                }, 1000);
+            } else {
+                showMessage(`❌ ${result.message}`, 'error');
+            }
+        }
+        
+        function logout() {
+            hideUserPanel();
+            // Очищаем поля формы
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            showMessage('👋 Вы вышли из системы', 'success');
+        }
+        
+        // ===== ФУНКЦИИ РАБОТЫ С ПЕРСОНАЖАМИ =====
+        
+        // Загрузка персонажей пользователя
+        function loadUserCharacters() {
+            if (!currentUser) return;
+            
+            const characters = db.getUserCharacters(currentUser.id);
+            const charactersList = document.getElementById('charactersList');
+            
+            charactersList.innerHTML = '';
+            
+            if (characters.length === 0) {
+                // Показываем карточку для создания первого персонажа
+                charactersList.innerHTML = `
+                    <div class="character-card empty" onclick="createNewCharacter()">
+                        <div class="empty-icon">➕</div>
+                        <div style="text-align: center;">
+                            <div style="font-size: 1.1em; margin-bottom: 5px; color: #ffcc00;">Нет персонажей</div>
+                            <div style="font-size: 0.9em;">Создайте своего первого персонажа!</div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                // Отображаем всех персонажей
+                characters.forEach(character => {
+                    const characterCard = document.createElement('div');
+                    characterCard.className = 'character-card';
+                    characterCard.dataset.charId = character.id;
+                    
+                    if (selectedCharacter && selectedCharacter.id === character.id) {
+                        characterCard.classList.add('selected');
+                    }
+                    
+                    const createdDate = new Date(character.created);
+                    const formattedDate = createdDate.toLocaleDateString();
+                    
+                    // Формируем описание персонажа
+                    const appearance = `${character.hair} ${character.hairColor ? '(' + character.hairColor + ')' : ''}`;
+                    const outfit = `${character.clothes} ${character.clothesColor ? '(' + character.clothesColor + ')' : ''}`;
+                    
+                    characterCard.innerHTML = `
+                        <div class="character-preview">
+                        </div>
+                        <div class="character-name">${character.name}</div>
+                        <div class="character-details">
+                            ${appearance}<br>
+                            ${outfit}<br>
+                            <small>Создан: ${formattedDate}</small>
+                        </div>
+                        <div class="character-actions">
+                            <button class="character-action-btn use-btn" onclick="selectCharacter(${character.id})">
+                                Выбрать
+                            </button>
+                            <button class="character-action-btn delete-btn" onclick="deleteCharacter(${character.id})">
+                                Удалить
+                            </button>
+                        </div>
+                    `;
+                    
+                    charactersList.appendChild(characterCard);
+                });
+            }
+            
+            // Обновляем счетчик персонажей
+            document.getElementById('charCount').textContent = characters.length;
+        }
+        
+        // Загрузка выбранного персонажа
+        function loadSelectedCharacter() {
+            if (!currentUser) return;
+            
+            const result = db.getUserSelectedCharacter(currentUser.id);
+            const selectedInfo = document.getElementById('selectedCharacterInfo');
+            
+            if (result.success) {
+                selectedCharacter = result.character;
+                selectedInfo.classList.add('show');
+                
+                // Обновляем информацию о выбранном персонаже
+                document.getElementById('selectedCharName').textContent = result.character.name;
+                document.getElementById('selectedCharAppearance').textContent = 
+                    `${result.character.hair} (${result.character.hairColor}), ${result.character.skin} кожа, ${result.character.face}`;
+                document.getElementById('selectedCharClothes').textContent = 
+                    `${result.character.clothes} (${result.character.clothesColor}) ${result.character.accessory ? '+ ' + result.character.accessory : ''}`;
+                
+                const createdDate = new Date(result.character.created);
+                document.getElementById('selectedCharCreated').textContent = createdDate.toLocaleString();
+                
+                // Обновляем выделение в списке
+                document.querySelectorAll('.character-card').forEach(card => {
+                    card.classList.remove('selected');
+                    if (parseInt(card.dataset.charId) === result.character.id) {
+                        card.classList.add('selected');
+                    }
+                });
+            } else {
+                selectedCharacter = null;
+                selectedInfo.classList.remove('show');
+            }
+        }
+        
+        // Выбор персонажа
+        function selectCharacter(charId) {
+            if (!currentUser) return;
+            
+            const result = db.setUserSelectedCharacter(currentUser.id, charId);
+            if (result.success) {
+                loadSelectedCharacter();
+                showMessage('✅ Персонаж выбран!', 'success');
+            }
+        }
+        
+        // Отмена выбора персонажа
+        function deselectCharacter() {
+            if (!currentUser) return;
+            
+            const result = db.clearUserSelectedCharacter(currentUser.id);
+            if (result.success) {
+                selectedCharacter = null;
+                document.getElementById('selectedCharacterInfo').classList.remove('show');
+                showMessage('✅ Выбор персонажа отменен', 'success');
+                
+                // Снимаем выделение со всех карточек
+                document.querySelectorAll('.character-card').forEach(card => {
+                    card.classList.remove('selected');
+                });
+            }
+        }
+        
+        // Удаление персонажа
+        function deleteCharacter(charId) {
+            if (!confirm('Вы уверены, что хотите удалить этого персонажа?')) {
+                return;
+            }
+            
+            const result = db.deleteCharacter(charId);
+            if (result.success) {
+                // Если удалили выбранного персонажа, снимаем выбор
+                if (selectedCharacter && selectedCharacter.id === charId) {
+                    deselectCharacter();
+                }
+                
+                // Перезагружаем список персонажей
+                loadUserCharacters();
+                showMessage('✅ Персонаж удален', 'success');
+                
+                // Обновляем статистику в консоли
+                updateConsoleStats();
+            } else {
+                showMessage(`❌ ${result.message}`, 'error');
+            }
+        }
+        
+        // Редактирование персонажа
+        function editCharacter(charId) {
+            // Сохраняем ID персонажа для редактирования
+            localStorage.setItem('editCharacterId', charId);
+            // Переходим на страницу создания/редактирования
+            window.location.href = 'create-character.html?edit=' + charId;
+        }
+        
+        // Редактирование выбранного персонажа
+        function editSelectedCharacter() {
+            if (selectedCharacter) {
+                editCharacter(selectedCharacter.id);
+            }
+        }
+        
+        // Создание нового персонажа
+        function createNewCharacter() {
+            localStorage.removeItem('editCharacterId');
+            window.location.href = 'create-character.html';
+        }
+        
+        // Играть с выбранным персонажем
+        function playWithSelectedCharacter() {
+            if (!selectedCharacter) {
+                showMessage('❌ Сначала выберите персонажа!', 'error');
+                return;
+            }
+            
+            // Сохраняем выбранного персонажа в сессии
+            localStorage.setItem('activeCharacter', JSON.stringify(selectedCharacter));
+            
+            // Переходим на страницу игры
+            window.location.href = 'game-world.html';
+        }
+        
+        // ===== КОНСОЛЬ АДМИНИСТРАТОРА/АССИСТЕНТА =====
+        
+        // Показать/скрыть консоль
+        function showAdminConsole() {
+            if (!currentUser || (!currentUser.isAdmin && !currentUser.isAssistant)) return;
+            
+            const consoleEl = document.getElementById('adminConsole');
+            const toggleBtn = consoleEl.querySelector('.console-toggle i');
+            
+            if (!isConsoleVisible) {
+                consoleEl.style.display = 'block';
+                toggleBtn.className = 'fas fa-chevron-up';
+                isConsoleVisible = true;
+                updateConsoleStats();
+                showConsoleMessage(`Консоль ${currentUser.isAdmin ? 'администратора' : 'ассистента'} активирована`, 'success');
+            }
+        }
+        
+        function toggleConsole() {
+            if (!currentUser || (!currentUser.isAdmin && !currentUser.isAssistant)) return;
+            
+            const consoleEl = document.getElementById('adminConsole');
+            const toggleBtn = consoleEl.querySelector('.console-toggle i');
+            
+            if (isConsoleVisible) {
+                consoleEl.style.display = 'none';
+                toggleBtn.className = 'fas fa-chevron-down';
+                isConsoleVisible = false;
+            } else {
+                consoleEl.style.display = 'block';
+                toggleBtn.className = 'fas fa-chevron-up';
+                isConsoleVisible = true;
+                updateConsoleStats();
+            }
+        }
+        
+        // Обновление статистики в консоли
+        function updateConsoleStats() {
+            if (!currentUser || (!currentUser.isAdmin && !currentUser.isAssistant)) return;
+            
+            const stats = db.getDatabaseStats();
+            
+            document.getElementById('consoleUserCount').textContent = stats.users;
+            document.getElementById('consoleCharCount').textContent = stats.characters;
+            document.getElementById('consoleDbSize').textContent = stats.dbSize;
+            document.getElementById('consoleLastBackup').textContent = 
+                stats.lastBackup === 'Никогда' ? 'Никогда' : new Date(stats.lastBackup).toLocaleString();
+        }
+        
+        // Скачать базу данных
+        function downloadDatabase() {
+            if (!currentUser || (!currentUser.isAdmin && !currentUser.isAssistant)) {
+                showConsoleMessage('Доступ запрещен! Только для администраторов и ассистентов.', 'error');
+                return;
+            }
+            
+            try {
+                const data = db.exportDatabase();
+                const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+                const filename = `character_database_backup_${timestamp}.json`;
+                
+                // Создаем временную ссылку для скачивания
+                const blob = new Blob([data], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                // Создаем резервную копию
+                db.createBackup();
+                
+                showConsoleMessage(`База данных скачана как ${filename}`, 'success');
+                updateConsoleStats();
+            } catch (error) {
+                showConsoleMessage(`Ошибка при скачивании: ${error.message}`, 'error');
+            }
+        }
+        
+        // Загрузить базу данных
+        function uploadDatabase(event) {
+            if (!currentUser || (!currentUser.isAdmin && !currentUser.isAssistant)) {
+                showConsoleMessage('Доступ запрещен! Только для администраторов и ассистентов.', 'error');
+                return;
+            }
+            
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            if (!file.name.endsWith('.json')) {
+                showConsoleMessage('Пожалуйста, выберите JSON файл', 'error');
+                return;
+            }
+            
+            if (!confirm('ВНИМАНИЕ: Это перезапишет текущую базу данных. Продолжить?')) {
+                event.target.value = '';
+                return;
+            }
+            
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                try {
+                    const result = db.importDatabase(e.target.result);
+                    
+                    if (result.success) {
+                        showConsoleMessage(`✅ ${result.message}`, 'success');
+                        showConsoleMessage(`Загружено: ${result.stats.users} пользователей, ${result.stats.characters} персонажей`, 'info');
+                        
+                        // Обновляем интерфейс
+                        updateConsoleStats();
+                        
+                        // Перезагружаем данные текущего пользователя
+                        if (currentUser) {
+                            const userCheck = db.getUserById(currentUser.id);
+                            if (userCheck.success) {
+                                showUserPanel(userCheck.user);
+                            }
+                        }
+                    } else {
+                        showConsoleMessage(`❌ ${result.message}`, 'error');
+                    }
+                } catch (error) {
+                    showConsoleMessage(`Ошибка при обработке файла: ${error.message}`, 'error');
+                }
+                
+                // Очищаем поле выбора файла
+                event.target.value = '';
+            };
+            
+            reader.onerror = function() {
+                showConsoleMessage('Ошибка при чтении файла', 'error');
+                event.target.value = '';
+            };
+            
+            reader.readAsText(file);
+        }
+        
+        // Перейти в админ панель
+        function goToAdminPanel() {
+            if (!currentUser || (!currentUser.isAdmin && !currentUser.isAssistant)) {
+                showConsoleMessage('Доступ запрещен! Только для администраторов и ассистентов.', 'error');
+                return;
+            }
+            
+            showConsoleMessage('Переход в админ-панель...', 'info');
+            
+            // Открываем админ-панель в новой вкладке
+            setTimeout(() => {
+                window.open('admin-panel.html', '_blank');
+            }, 500);
+        }
+        
+        // Удалить всех пользователей
+        function deleteAllUsers() {
+            if (!currentUser || (!currentUser.isAdmin && !currentUser.isAssistant)) {
+                showConsoleMessage('Доступ запрещен! Только для администраторов и ассистентов.', 'error');
+                return;
+            }
+            
+            if (!confirm('ВНИМАНИЕ: Это удалит всех пользователей кроме администраторов и ассистентов. Все персонажи обычных пользователей также будут удалены. Продолжить?')) {
+                return;
+            }
+            
+            const result = db.deleteAllUsers();
+            
+            if (result.success) {
+                showConsoleMessage(`✅ ${result.message}`, 'success');
+                showConsoleMessage(`Осталось: ${result.stats.users} пользователей, ${result.stats.characters} персонажей`, 'info');
+                
+                // Обновляем интерфейс
+                updateConsoleStats();
+                
+                // Если текущий пользователь не админ и не ассистент, выходим
+                if (currentUser && !currentUser.isAdmin && !currentUser.isAssistant) {
+                    showConsoleMessage('Ваш аккаунт был удален. Выход из системы...', 'warning');
+                    setTimeout(() => {
+                        logout();
+                    }, 2000);
+                } else {
+                    // Перезагружаем данные
+                    loadUserCharacters();
+                    loadSelectedCharacter();
+                }
+            }
+        }
+        
+        // Восстановление сессии при загрузке страницы
+        function restoreSession() {
+            const savedUser = localStorage.getItem('currentUser');
+            
+            if (savedUser) {
+                try {
+                    const user = JSON.parse(savedUser);
+                    const userCheck = db.getUserById(user.id);
+                    
+                    if (userCheck.success) {
+                        showUserPanel(userCheck.user);
+                    } else {
+                        localStorage.removeItem('currentUser');
+                    }
+                } catch (e) {
+                    localStorage.removeItem('currentUser');
+                }
+            }
+        }
+        
+        // Инициализация при загрузке страницы
+        window.addEventListener('load', function() {
+            // Инициализируем навигационную панель для неавторизованных пользователей
+            updateNavigationPanel(false);
+            restoreSession();
+            
+            // Обработка нажатия Enter в полях формы
+            const usernameInput = document.getElementById('username');
+            const passwordInput = document.getElementById('password');
+            
+            function handleEnterKey(e) {
+                if (e.key === 'Enter') {
+                    if (document.getElementById('authForm').style.display !== 'none') {
+                        login();
+                    }
+                }
+            }
+            
+            usernameInput.addEventListener('keypress', handleEnterKey);
+            passwordInput.addEventListener('keypress', handleEnterKey);
+        });
+    </script>
+</body>
+</html>

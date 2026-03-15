@@ -1,0 +1,29 @@
+.data-section {
+    margin-bottom: 15px;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+}
+
+.data-title {
+    color: #ffcc00;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.data-content {
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    color: #00ff00;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 8px;
+    border-radius: 3px;
+    max-height: 150px;
+    overflow-y: auto;
+}
+.console-btn.admin-panel {
+    background: linear-gradient(135deg, #9C27B0, #673AB7);
+    color: white;
+}

@@ -1,0 +1,1236 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Создать персонажа</title>
+    <style>
+        body {
+            background: black;
+            margin: 0;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+            color: white;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            color: yellow;
+            margin-bottom: 10px;
+        }
+        
+        .main-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 40px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .character-area {
+            flex: 1;
+            min-width: 300px;
+            text-align: center;
+        }
+        
+        .character-box {
+            width: 250px;
+            height: 400px;
+            background: #222;
+            margin: 0 auto 20px;
+            position: relative;
+            border-radius: 10px;
+            border: 2px solid #444;
+            overflow: hidden;
+        }
+        
+        .char-part {
+            position: absolute;
+            transition: all 0.3s;
+        }
+        
+        #char-body {
+            width: 120px;
+            height: 180px;
+            background: #666;
+            bottom: 30px;
+            left: 65px;
+            border-radius: 10px;
+        }
+        
+        #char-head {
+            width: 80px;
+            height: 80px;
+            background: #ffcc99;
+            top: 80px;
+            left: 85px;
+            border-radius: 50%;
+            z-index: 2;
+        }
+        
+        #char-hair {
+            width: 90px;
+            height: 40px;
+            background: #8B4513;
+            top: 70px;
+            left: 80px;
+            z-index: 3;
+        }
+        
+        #char-face {
+            width: 80px;
+            height: 80px;
+            top: 80px;
+            left: 85px;
+            z-index: 4;
+        }
+        
+        .face-part {
+            position: absolute;
+        }
+        
+        .eyes-container {
+            width: 50px;
+            top: 30px;
+            left: 15px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .eye {
+            width: 12px;
+            height: 12px;
+            background: black;
+            border-radius: 50%;
+        }
+        
+        .mouth {
+            width: 30px;
+            height: 5px;
+            background: #c96;
+            top: 55px;
+            left: 25px;
+            border-radius: 2px;
+        }
+        
+        #char-clothes {
+            width: 140px;
+            height: 70px;
+            background: #1E90FF;
+            bottom: 120px;
+            left: 55px;
+            z-index: 2;
+            border-radius: 5px;
+        }
+        
+        #char-accessory {
+            position: absolute;
+            z-index: 5;
+        }
+        
+        .controls-area {
+            flex: 2;
+            min-width: 300px;
+        }
+        
+        .controls-title {
+            color: yellow;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .control-group {
+            background: #222;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+        }
+        
+        .control-title {
+            margin-bottom: 10px;
+            color: #ffcc00;
+            display: flex;
+            align-items: center;
+        }
+        
+        .control-title i {
+            margin-right: 10px;
+        }
+        
+        .option-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+        
+        .option-name {
+            min-width: 150px;
+        }
+        
+        .arrow-btn {
+            width: 40px;
+            height: 40px;
+            background: #444;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        
+        .arrow-btn:hover {
+            background: #666;
+        }
+        
+        .option-value {
+            color: yellow;
+            font-weight: bold;
+            min-width: 120px;
+            text-align: center;
+        }
+        
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .option-item {
+            padding: 8px;
+            background: #333;
+            border-radius: 5px;
+            text-align: center;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        
+        .option-item:hover {
+            border-color: #666;
+        }
+        
+        .option-item.selected {
+            border-color: yellow;
+            background: #444;
+        }
+        
+        .color-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .color-option {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        
+        .color-option:hover {
+            transform: scale(1.1);
+        }
+        
+        .color-option.selected {
+            border-color: white;
+            box-shadow: 0 0 5px white;
+        }
+        
+        .name-input-group {
+            margin-bottom: 15px;
+        }
+        
+        .name-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #ffcc00;
+            font-weight: bold;
+        }
+        
+        .name-input {
+            width: 100%;
+            padding: 12px;
+            background: #333;
+            border: 2px solid #444;
+            border-radius: 8px;
+            color: white;
+            font-size: 16px;
+        }
+        
+        .name-input:focus {
+            outline: none;
+            border-color: yellow;
+        }
+        
+        .name-hint {
+            font-size: 12px;
+            color: #888;
+            margin-top: 5px;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            justify-content: center;
+        }
+        
+        .action-btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            flex: 1;
+        }
+        
+        .back-btn {
+            background: white;
+            color: black;
+        }
+        
+        .finish-btn {
+            background: yellow;
+            color: black;
+        }
+        
+        .action-btn:hover {
+            transform: scale(1.05);
+        }
+        
+        .info-box {
+            margin-top: 20px;
+            padding: 15px;
+            background: #222;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .char-name-display {
+            font-size: 20px;
+            font-weight: bold;
+            color: yellow;
+            margin-bottom: 10px;
+        }
+        
+        .char-details {
+            color: #ccc;
+            font-size: 14px;
+        }
+        
+        /* Модальное окно */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .modal-content {
+            background: #1a1a2e;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
+            border: 2px solid #ffcc00;
+            box-shadow: 0 20px 50px rgba(255, 204, 0, 0.3);
+            text-align: center;
+            animation: slideIn 0.5s;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .modal-title {
+            font-size: 2em;
+            color: #ffcc00;
+            margin-bottom: 20px;
+        }
+        
+        .modal-message {
+            font-size: 1.1em;
+            color: #ccc;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .modal-btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .modal-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(255, 204, 0, 0.3);
+        }
+        
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Модальное окно -->
+    <div id="creationModal" class="modal">
+        <div class="modal-content">
+            <h2 class="modal-title">Персонаж создан!</h2>
+            <div class="modal-message" id="modalMessage">
+                Ваш персонаж успешно сохранен в базу данных.
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn" onclick="returnToMainPage()" style="background: #ffcc00; color: black; width: 100%;">
+                    Вернуться к выбору персонажей
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="header">
+        <h1>Создание персонажа</h1>
+        <p>Настройте внешность вашего персонажа</p>
+    </div>
+    
+    <div class="main-container">
+        <div class="character-area">
+            <div class="character-box">
+                <div class="char-part" id="char-body"></div>
+                <div class="char-part" id="char-clothes"></div>
+                <div class="char-part" id="char-head"></div>
+                <div class="char-part" id="char-hair"></div>
+                <div class="char-part" id="char-accessory"></div>
+                <div class="char-part" id="char-face">
+                    <div class="face-part eyes-container">
+                        <div class="eye"></div>
+                        <div class="eye"></div>
+                    </div>
+                    <div class="face-part mouth"></div>
+                </div>
+            </div>
+            <div class="info-box">
+                <div class="char-name-display" id="char-name-display">Безымянный герой</div>
+                <div class="char-details" id="char-info">Прическа: Прямые, Одежда: Футболка</div>
+            </div>
+        </div>
+        
+        <div class="controls-area">
+            <h2 class="controls-title">Настройки персонажа</h2>
+            
+            <div class="control-group">
+                <div class="control-title"><i class="fas fa-signature"></i> Имя персонажа</div>
+                <div class="name-input-group">
+                    <input type="text" class="name-input" id="char-name-input" 
+                           placeholder="Введите имя вашего персонажа" 
+                           maxlength="20"
+                           value="Безымянный герой">
+                    <div class="name-hint">Максимум 20 символов</div>
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <div class="control-title"><i class="fas fa-user"></i> Лицо</div>
+                
+                <div class="option-controls">
+                    <div class="option-name">Тип лица:</div>
+                    <button class="arrow-btn left" data-option="face">←</button>
+                    <div class="option-value" id="face-val">Обычное</div>
+                    <button class="arrow-btn right" data-option="face">→</button>
+                </div>
+                
+                <div class="option-controls">
+                    <div class="option-name">Цвет кожи:</div>
+                    <div class="color-options" id="skin-colors">
+                        <!-- Будет заполнено скриптом -->
+                    </div>
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <div class="control-title"><i class="fas fa-cut"></i> Волосы</div>
+                
+                <div class="options-grid" id="hair-styles">
+                    <!-- Будет заполнено скриптом -->
+                </div>
+                
+                <div class="option-controls" style="margin-top: 15px;">
+                    <div class="option-name">Цвет волос:</div>
+                    <div class="color-options" id="hair-colors">
+                        <!-- Будет заполнено скриптом -->
+                    </div>
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <div class="control-title"><i class="fas fa-tshirt"></i> Одежда</div>
+                
+                <div class="options-grid" id="clothes-styles">
+                    <!-- Будет заполнено скриптом -->
+                </div>
+                
+                <div class="option-controls" style="margin-top: 15px;">
+                    <div class="option-name">Цвет одежды:</div>
+                    <div class="color-options" id="clothes-colors">
+                        <!-- Будет заполнено скриптом -->
+                    </div>
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <div class="control-title"><i class="fas fa-gem"></i> Аксессуары</div>
+                
+                <div class="options-grid" id="accessory-options">
+                    <!-- Будет заполнено скриптом -->
+                </div>
+            </div>
+            
+            <div class="buttons">
+                <button class="action-btn back-btn" onclick="goBack()">
+                    <i class="fas fa-arrow-left"></i> На главную
+                </button>
+                <button class="action-btn finish-btn" onclick="finishCreation()">
+                    <i class="fas fa-check"></i> Создать персонажа
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Класс для работы с базой данных
+        class UserDatabase {
+            constructor() {
+                this.dbName = 'character_creator_db';
+                this.init();
+            }
+            
+            init() {
+                if (!localStorage.getItem(this.dbName)) {
+                    const initialData = {
+                        users: [
+                            {
+                                id: 1,
+                                username: 'admin',
+                                password: 'admin123',
+                                created: new Date().toISOString(),
+                                lastLogin: new Date().toISOString(),
+                                loginCount: 1,
+                                isAdmin: true
+                            }
+                        ],
+                        nextId: 2,
+                        characters: [],
+                        nextCharId: 1
+                    };
+                    localStorage.setItem(this.dbName, JSON.stringify(initialData));
+                }
+            }
+            
+            // Получить текущего пользователя
+            getCurrentUser() {
+                const userStr = localStorage.getItem('currentUser');
+                if (userStr) {
+                    try {
+                        return JSON.parse(userStr);
+                    } catch {
+                        return null;
+                    }
+                }
+                return null;
+            }
+            
+            // Создать персонажа
+            createCharacter(userId, characterData) {
+                const db = JSON.parse(localStorage.getItem(this.dbName));
+                
+                if (!db.characters) db.characters = [];
+                
+                const newCharId = db.nextCharId || 1;
+                db.nextCharId = newCharId + 1;
+                
+                const newCharacter = {
+                    id: newCharId,
+                    userId: userId,
+                    name: characterData.name,
+                    face: characterData.face,
+                    skin: characterData.skin,
+                    hair: characterData.hair,
+                    hairColor: characterData.hairColor,
+                    clothes: characterData.clothes,
+                    clothesColor: characterData.clothesColor,
+                    accessory: characterData.accessory,
+                    created: new Date().toISOString(),
+                    avatar: this.generateAvatar(characterData)
+                };
+                
+                db.characters.push(newCharacter);
+                localStorage.setItem(this.dbName, JSON.stringify(db));
+                
+                return { success: true, character: newCharacter };
+            }
+            
+            generateAvatar(characterData) {
+                const faceEmoji = {
+                    'Обычное': '😐',
+                    'Улыбающееся': '😊',
+                    'Серьезное': '😠',
+                    'Злое': '😡'
+                };
+                
+                const hairEmoji = {
+                    'Прямые': '💇',
+                    'Короткие': '💇‍♂️',
+                    'Длинные': '👩',
+                    'Кудрявые': '👨‍🦱',
+                    'Ирокез': '🤘',
+                    'Хвост': '👱‍♀️',
+                    'Боб': '💁',
+                    'Лысый': '🧑‍🦲'
+                };
+                
+                const clothesEmoji = {
+                    'Футболка': '👕',
+                    'Рубашка': '👔',
+                    'Куртка': '🧥',
+                    'Плащ': '🦸',
+                    'Доспехи': '⚔️',
+                    'Пиджак': '🤵',
+                    'Свитер': '🧶',
+                    'Платье': '👗'
+                };
+                
+                const face = faceEmoji[characterData.face] || '😐';
+                const hair = hairEmoji[characterData.hair] || '💇';
+                const clothes = clothesEmoji[characterData.clothes] || '👕';
+                
+                return hair + ' ' + face + ' ' + clothes;
+            }
+        }
+
+        // Конфигурация персонажа
+        const config = {
+            name: "Безымянный герой",
+            face: {
+                types: ['Обычное', 'Улыбающееся', 'Серьезное', 'Злое'],
+                index: 0,
+                update: function() {
+                    document.getElementById('face-val').textContent = this.types[this.index];
+                    updateMouth();
+                    updateInfo();
+                }
+            },
+            skin: {
+                colors: [
+                    {name: 'Светлый', hex: '#ffcc99'},
+                    {name: 'Загорелый', hex: '#d2691e'},
+                    {name: 'Темный', hex: '#8d5524'},
+                    {name: 'Бледный', hex: '#ffdbac'},
+                    {name: 'Оливковый', hex: '#c19a6b'}
+                ],
+                index: 0,
+                update: function() {
+                    document.getElementById('char-head').style.background = this.colors[this.index].hex;
+                    updateInfo();
+                }
+            },
+            hair: {
+                styles: [
+                    {name: 'Прямые', type: 'straight'},
+                    {name: 'Короткие', type: 'short'},
+                    {name: 'Длинные', type: 'long'},
+                    {name: 'Кудрявые', type: 'curly'},
+                    {name: 'Ирокез', type: 'mohawk'},
+                    {name: 'Хвост', type: 'ponytail'},
+                    {name: 'Боб', type: 'bob'},
+                    {name: 'Лысый', type: 'bald'}
+                ],
+                index: 0,
+                update: function() {
+                    updateHairStyle();
+                    updateInfo();
+                }
+            },
+            hairColor: {
+                colors: [
+                    {name: 'Коричневый', hex: '#8B4513'},
+                    {name: 'Черный', hex: '#000000'},
+                    {name: 'Рыжий', hex: '#A52A2A'},
+                    {name: 'Блонд', hex: '#F0E68C'},
+                    {name: 'Седой', hex: '#808080'},
+                    {name: 'Розовый', hex: '#FF69B4'},
+                    {name: 'Синий', hex: '#4169E1'},
+                    {name: 'Фиолетовый', hex: '#8A2BE2'}
+                ],
+                index: 0,
+                update: function() {
+                    document.getElementById('char-hair').style.background = this.colors[this.index].hex;
+                    updateInfo();
+                }
+            },
+            clothes: {
+                styles: [
+                    {name: 'Футболка', type: 't-shirt'},
+                    {name: 'Рубашка', type: 'shirt'},
+                    {name: 'Куртка', type: 'jacket'},
+                    {name: 'Плащ', type: 'cloak'},
+                    {name: 'Доспехи', type: 'armor'},
+                    {name: 'Пиджак', type: 'suit'},
+                    {name: 'Свитер', type: 'sweater'},
+                    {name: 'Платье', type: 'dress'}
+                ],
+                index: 0,
+                update: function() {
+                    updateClothesStyle();
+                    updateInfo();
+                }
+            },
+            clothesColor: {
+                colors: [
+                    {name: 'Синий', hex: '#1E90FF'},
+                    {name: 'Красный', hex: '#FF4500'},
+                    {name: 'Зеленый', hex: '#32CD32'},
+                    {name: 'Черный', hex: '#000000'},
+                    {name: 'Фиолетовый', hex: '#8A2BE2'},
+                    {name: 'Белый', hex: '#FFFFFF'},
+                    {name: 'Серый', hex: '#808080'},
+                    {name: 'Золотой', hex: '#FFD700'}
+                ],
+                index: 0,
+                update: function() {
+                    document.getElementById('char-clothes').style.background = this.colors[this.index].hex;
+                    updateInfo();
+                }
+            },
+            accessory: {
+                types: [
+                    {name: 'Нет', type: 'none'},
+                    {name: 'Очки', type: 'glasses'},
+                    {name: 'Шляпа', type: 'hat'},
+                    {name: 'Бандана', type: 'bandana'},
+                    {name: 'Серьга', type: 'earring'},
+                    {name: 'Шарф', type: 'scarf'}
+                ],
+                index: 0,
+                update: function() {
+                    updateAccessory();
+                    updateInfo();
+                }
+            }
+        };
+        
+        const db = new UserDatabase();
+        
+        // Функция обновления имени
+        function updateCharacterName() {
+            const nameInput = document.getElementById('char-name-input');
+            let newName = nameInput.value.trim();
+            
+            if (!newName) {
+                newName = "Безымянный герой";
+                nameInput.value = newName;
+            }
+            
+            if (newName.length > 20) {
+                newName = newName.substring(0, 20);
+                nameInput.value = newName;
+            }
+            
+            config.name = newName;
+            document.getElementById('char-name-display').textContent = newName;
+        }
+        
+        // Инициализация интерфейса
+        function initInterface() {
+            // Имя
+            const nameInput = document.getElementById('char-name-input');
+            nameInput.addEventListener('input', updateCharacterName);
+            nameInput.addEventListener('blur', updateCharacterName);
+            
+            // Цвета кожи
+            const skinColorsContainer = document.getElementById('skin-colors');
+            config.skin.colors.forEach((color, index) => {
+                const colorEl = document.createElement('div');
+                colorEl.className = 'color-option';
+                colorEl.style.background = color.hex;
+                colorEl.dataset.index = index;
+                if (index === config.skin.index) colorEl.classList.add('selected');
+                
+                colorEl.addEventListener('click', function() {
+                    config.skin.index = parseInt(this.dataset.index);
+                    document.querySelectorAll('#skin-colors .color-option').forEach(el => el.classList.remove('selected'));
+                    this.classList.add('selected');
+                    config.skin.update();
+                });
+                
+                skinColorsContainer.appendChild(colorEl);
+            });
+            
+            // Стили причесок
+            const hairStylesContainer = document.getElementById('hair-styles');
+            config.hair.styles.forEach((style, index) => {
+                const styleEl = document.createElement('div');
+                styleEl.className = 'option-item';
+                styleEl.textContent = style.name;
+                styleEl.dataset.index = index;
+                if (index === config.hair.index) styleEl.classList.add('selected');
+                
+                styleEl.addEventListener('click', function() {
+                    config.hair.index = parseInt(this.dataset.index);
+                    document.querySelectorAll('#hair-styles .option-item').forEach(el => el.classList.remove('selected'));
+                    this.classList.add('selected');
+                    config.hair.update();
+                });
+                
+                hairStylesContainer.appendChild(styleEl);
+            });
+            
+            // Цвета волос
+            const hairColorsContainer = document.getElementById('hair-colors');
+            config.hairColor.colors.forEach((color, index) => {
+                const colorEl = document.createElement('div');
+                colorEl.className = 'color-option';
+                colorEl.style.background = color.hex;
+                colorEl.dataset.index = index;
+                if (index === config.hairColor.index) colorEl.classList.add('selected');
+                
+                colorEl.addEventListener('click', function() {
+                    config.hairColor.index = parseInt(this.dataset.index);
+                    document.querySelectorAll('#hair-colors .color-option').forEach(el => el.classList.remove('selected'));
+                    this.classList.add('selected');
+                    config.hairColor.update();
+                });
+                
+                hairColorsContainer.appendChild(colorEl);
+            });
+            
+            // Стили одежды
+            const clothesStylesContainer = document.getElementById('clothes-styles');
+            config.clothes.styles.forEach((style, index) => {
+                const styleEl = document.createElement('div');
+                styleEl.className = 'option-item';
+                styleEl.textContent = style.name;
+                styleEl.dataset.index = index;
+                if (index === config.clothes.index) styleEl.classList.add('selected');
+                
+                styleEl.addEventListener('click', function() {
+                    config.clothes.index = parseInt(this.dataset.index);
+                    document.querySelectorAll('#clothes-styles .option-item').forEach(el => el.classList.remove('selected'));
+                    this.classList.add('selected');
+                    config.clothes.update();
+                });
+                
+                clothesStylesContainer.appendChild(styleEl);
+            });
+            
+            // Цвета одежды
+            const clothesColorsContainer = document.getElementById('clothes-colors');
+            config.clothesColor.colors.forEach((color, index) => {
+                const colorEl = document.createElement('div');
+                colorEl.className = 'color-option';
+                colorEl.style.background = color.hex;
+                colorEl.dataset.index = index;
+                if (index === config.clothesColor.index) colorEl.classList.add('selected');
+                
+                colorEl.addEventListener('click', function() {
+                    config.clothesColor.index = parseInt(this.dataset.index);
+                    document.querySelectorAll('#clothes-colors .color-option').forEach(el => el.classList.remove('selected'));
+                    this.classList.add('selected');
+                    config.clothesColor.update();
+                });
+                
+                clothesColorsContainer.appendChild(colorEl);
+            });
+            
+            // Аксессуары
+            const accessoryContainer = document.getElementById('accessory-options');
+            config.accessory.types.forEach((accessory, index) => {
+                const accessoryEl = document.createElement('div');
+                accessoryEl.className = 'option-item';
+                accessoryEl.textContent = accessory.name;
+                accessoryEl.dataset.index = index;
+                if (index === config.accessory.index) accessoryEl.classList.add('selected');
+                
+                accessoryEl.addEventListener('click', function() {
+                    config.accessory.index = parseInt(this.dataset.index);
+                    document.querySelectorAll('#accessory-options .option-item').forEach(el => el.classList.remove('selected'));
+                    this.classList.add('selected');
+                    config.accessory.update();
+                });
+                
+                accessoryContainer.appendChild(accessoryEl);
+            });
+        }
+        
+        // Обработчики для стрелок
+        document.querySelectorAll('.arrow-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const option = this.dataset.option;
+                const isLeft = this.classList.contains('left');
+                changeOption(option, isLeft);
+            });
+        });
+        
+        function changeOption(option, isLeft) {
+            const cfg = config[option];
+            const maxIndex = cfg.colors?.length - 1 || cfg.types?.length - 1 || cfg.styles?.length - 1;
+            
+            if (isLeft) {
+                cfg.index = cfg.index > 0 ? cfg.index - 1 : maxIndex;
+            } else {
+                cfg.index = cfg.index < maxIndex ? cfg.index + 1 : 0;
+            }
+            
+            if (option === 'face') {
+                document.getElementById('face-val').textContent = cfg.types[cfg.index];
+            }
+            
+            cfg.update();
+        }
+        
+        function updateMouth() {
+            const mouth = document.querySelector('.mouth');
+            const index = config.face.index;
+            
+            switch(index) {
+                case 1:
+                    mouth.style.height = '8px';
+                    mouth.style.width = '25px';
+                    mouth.style.borderRadius = '0 0 15px 15px';
+                    mouth.style.background = '#c96';
+                    mouth.style.top = '55px';
+                    mouth.style.left = '28px';
+                    break;
+                case 2:
+                    mouth.style.height = '3px';
+                    mouth.style.width = '25px';
+                    mouth.style.background = '#333';
+                    mouth.style.top = '58px';
+                    mouth.style.left = '28px';
+                    break;
+                case 3:
+                    mouth.style.height = '3px';
+                    mouth.style.width = '35px';
+                    mouth.style.background = '#c00';
+                    mouth.style.top = '58px';
+                    mouth.style.left = '23px';
+                    break;
+                default:
+                    mouth.style.height = '5px';
+                    mouth.style.width = '30px';
+                    mouth.style.borderRadius = '2px';
+                    mouth.style.background = '#c96';
+                    mouth.style.top = '55px';
+                    mouth.style.left = '25px';
+            }
+        }
+        
+        function updateHairStyle() {
+            const hair = document.getElementById('char-hair');
+            const index = config.hair.index;
+            const style = config.hair.styles[index];
+            
+            hair.style.display = 'block';
+            
+            switch(style.type) {
+                case 'short':
+                    hair.style.height = '25px';
+                    hair.style.width = '85px';
+                    hair.style.top = '75px';
+                    hair.style.left = '82px';
+                    hair.style.borderRadius = '20% 20% 50% 50%';
+                    break;
+                case 'long':
+                    hair.style.height = '70px';
+                    hair.style.width = '95px';
+                    hair.style.top = '70px';
+                    hair.style.left = '78px';
+                    hair.style.borderRadius = '40% 40% 20% 20%';
+                    break;
+                case 'curly':
+                    hair.style.height = '50px';
+                    hair.style.width = '95px';
+                    hair.style.top = '70px';
+                    hair.style.left = '78px';
+                    hair.style.borderRadius = '40%';
+                    break;
+                case 'mohawk':
+                    hair.style.height = '60px';
+                    hair.style.width = '30px';
+                    hair.style.top = '60px';
+                    hair.style.left = '105px';
+                    hair.style.borderRadius = '10px';
+                    break;
+                case 'ponytail':
+                    hair.style.height = '40px';
+                    hair.style.width = '70px';
+                    hair.style.top = '70px';
+                    hair.style.left = '85px';
+                    hair.style.borderRadius = '40% 40% 0 0';
+                    break;
+                case 'bob':
+                    hair.style.height = '45px';
+                    hair.style.width = '90px';
+                    hair.style.top = '75px';
+                    hair.style.left = '80px';
+                    hair.style.borderRadius = '45% 45% 50% 50%';
+                    break;
+                case 'bald':
+                    hair.style.display = 'none';
+                    break;
+                default:
+                    hair.style.height = '40px';
+                    hair.style.width = '90px';
+                    hair.style.top = '70px';
+                    hair.style.left = '80px';
+                    hair.style.borderRadius = '50% 50% 0 0';
+            }
+        }
+        
+        function updateClothesStyle() {
+            const clothes = document.getElementById('char-clothes');
+            const index = config.clothes.index;
+            const style = config.clothes.styles[index];
+            
+            switch(style.type) {
+                case 'shirt':
+                    clothes.style.height = '75px';
+                    clothes.style.width = '130px';
+                    clothes.style.left = '60px';
+                    clothes.style.borderRadius = '8px';
+                    break;
+                case 'jacket':
+                    clothes.style.height = '85px';
+                    clothes.style.width = '150px';
+                    clothes.style.left = '50px';
+                    clothes.style.borderRadius = '10px';
+                    break;
+                case 'cloak':
+                    clothes.style.height = '120px';
+                    clothes.style.width = '130px';
+                    clothes.style.left = '60px';
+                    clothes.style.borderRadius = '10px 10px 0 0';
+                    break;
+                case 'armor':
+                    clothes.style.height = '80px';
+                    clothes.style.width = '140px';
+                    clothes.style.left = '55px';
+                    clothes.style.borderRadius = '15px';
+                    break;
+                case 'suit':
+                    clothes.style.height = '75px';
+                    clothes.style.width = '135px';
+                    clothes.style.left = '57px';
+                    clothes.style.borderRadius = '5px';
+                    break;
+                case 'sweater':
+                    clothes.style.height = '65px';
+                    clothes.style.width = '130px';
+                    clothes.style.left = '60px';
+                    clothes.style.borderRadius = '20px';
+                    break;
+                case 'dress':
+                    clothes.style.height = '95px';
+                    clothes.style.width = '120px';
+                    clothes.style.left = '65px';
+                    clothes.style.borderRadius = '10px 10px 30px 30px';
+                    break;
+                default:
+                    clothes.style.height = '70px';
+                    clothes.style.width = '140px';
+                    clothes.style.left = '55px';
+                    clothes.style.borderRadius = '5px';
+            }
+        }
+        
+        function updateAccessory() {
+            const accessory = document.getElementById('char-accessory');
+            const index = config.accessory.index;
+            const type = config.accessory.types[index].type;
+            
+            accessory.innerHTML = '';
+            
+            switch(type) {
+                case 'glasses':
+                    accessory.innerHTML = '<div style="position:absolute;width:60px;height:20px;background:rgba(0,0,0,0.8);top:30px;left:10px;border-radius:10px;border:2px solid #666;"></div>';
+                    break;
+                case 'hat':
+                    accessory.innerHTML = '<div style="position:absolute;width:100px;height:25px;background:#8B4513;top:50px;left:75px;border-radius:50% 50% 0 0;"></div>';
+                    break;
+                case 'bandana':
+                    accessory.innerHTML = '<div style="position:absolute;width:90px;height:20px;background:red;top:70px;left:80px;border-radius:10px;"></div>';
+                    break;
+                case 'earring':
+                    accessory.innerHTML = '<div style="position:absolute;width:10px;height:20px;background:gold;top:45px;left:140px;border-radius:5px;"></div>';
+                    break;
+                case 'scarf':
+                    accessory.innerHTML = '<div style="position:absolute;width:30px;height:40px;background:red;top:100px;left:165px;border-radius:5px;"></div>';
+                    break;
+            }
+        }
+        
+        function updateInfo() {
+            const hairStyle = config.hair.styles[config.hair.index].name;
+            const clothesStyle = config.clothes.styles[config.clothes.index].name;
+            document.getElementById('char-info').textContent = 
+                `Прическа: ${hairStyle}, Одежда: ${clothesStyle}`;
+        }
+        
+        // Возврат на главную
+        function goBack() {
+            window.location.href = 'index.html';
+        }
+        
+        // Возврат к выбору персонажей
+        function returnToMainPage() {
+            window.location.href = 'index.html';
+        }
+        
+// ГЛАВНАЯ ФУНКЦИЯ - СОЗДАНИЕ ПЕРСОНАЖА
+function finishCreation() {
+    // Получаем текущего пользователя
+    const currentUser = db.getCurrentUser();
+    
+    if (!currentUser) {
+        alert('Ошибка: Вы не вошли в систему!');
+        window.location.href = 'index.html';
+        return;
+    }
+    
+    // Проверяем имя
+    if (!config.name || config.name === "Безымянный герой") {
+        const confirmName = confirm("Вы не задали имя персонажу. Хотите оставить 'Безымянный герой'?");
+        if (!confirmName) {
+            document.getElementById('char-name-input').focus();
+            return;
+        }
+    }
+    
+    // Собираем данные персонажа
+    const characterData = {
+        name: config.name,
+        face: config.face.types[config.face.index],
+        skin: config.skin.colors[config.skin.index].name,
+        hair: config.hair.styles[config.hair.index].name,
+        hairColor: config.hairColor.colors[config.hairColor.index].name,
+        clothes: config.clothes.styles[config.clothes.index].name,
+        clothesColor: config.clothesColor.colors[config.clothesColor.index].name,
+        accessory: config.accessory.types[config.accessory.index].name
+    };
+    
+    try {
+        // СОЗДАЕМ ПЕРСОНАЖА В БАЗЕ ДАННЫХ
+        const result = db.createCharacter(currentUser.id, characterData);
+        
+        if (result.success) {
+            // Сохраняем созданного персонажа как активного
+            localStorage.setItem('activeCharacter', JSON.stringify(result.character));
+            
+            // СОЗДАЕМ НОВЫЕ ИГРОВЫЕ ДАННЫЕ С НУЛЯ
+            const freshGameStats = {
+                name: characterData.name,
+                avatar: result.character.avatar,
+                money: 500,              // Начальные деньги
+                energy: 100,            // Текущая энергия
+                maxEnergy: 100,         // Максимальная энергия
+                strength: 5,           // Базовая сила
+                luck: 5,              // Базовая удача
+                intelligence: 5,      // Базовый интеллект
+                experience: 0,        // Начальный опыт
+                level: 1,            // Начальный уровень
+                totalEarned: 0,      // Всего заработано
+                totalSpent: 0,       // Всего потрачено
+                created: new Date().toISOString(),
+                lastPlayed: new Date().toISOString()
+            };
+            
+            // Сохраняем игровые параметры - ПЕРЕЗАПИСЫВАЕМ, А НЕ ДОБАВЛЯЕМ
+            localStorage.setItem('characterStats', JSON.stringify(freshGameStats));
+            
+            console.log('✅ Персонаж создан:', result.character);
+            console.log('🎮 Новые игровые данные:', freshGameStats);
+            
+            // Показываем модальное окно об успехе
+            document.getElementById('modalMessage').innerHTML = `
+                Ваш персонаж "${characterData.name}" успешно создан!<br><br>
+                👤 Имя: ${characterData.name}<br>
+                😊 Лицо: ${characterData.face}<br>
+                💇 Волосы: ${characterData.hair}<br>
+                👕 Одежда: ${characterData.clothes}<br><br>
+                💰 Начальные деньги: 500 ₽<br>
+                ⚡ Энергия: 100/100<br>
+                📊 Уровень: 1<br>
+                💪 Сила: 5 | 🍀 Удача: 5 | 🧠 Интеллект: 5
+            `;
+            document.getElementById('creationModal').style.display = 'flex';
+        }
+    } catch (error) {
+        console.error('❌ Ошибка создания персонажа:', error);
+        alert('Произошла ошибка при создании персонажа. Пожалуйста, попробуйте еще раз.');
+    }
+}
+
+        // Инициализация при загрузке
+        document.addEventListener('DOMContentLoaded', function() {
+            initInterface();
+            updateCharacterName();
+            Object.values(config).forEach(cfg => cfg.update && cfg.update());
+            
+            // Закрытие модального окна по клику на фон
+            document.getElementById('creationModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    window.location.href = 'index.html';
+                }
+            });
+            
+            // Проверка авторизации
+            const currentUser = db.getCurrentUser();
+            if (!currentUser) {
+                alert('Пожалуйста, войдите в систему для создания персонажа!');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1000);
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Банк и Криптобиржа</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(20, 20, 40, 0.7);
+            border-radius: 20px;
+            border: 2px solid #ffcc00;
+            backdrop-filter: blur(10px);
+            position: relative;
+        }
+        
+        .back-btn {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .back-btn:hover {
+            background: rgba(255, 204, 0, 0.2);
+            border-color: #ffcc00;
+        }
+        
+        .header h1 {
+            color: #ffcc00;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(255, 204, 0, 0.3);
+        }
+        
+        .header p {
+            color: #aaa;
+            font-size: 1.1em;
+        }
+        
+        .balance-section {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .balance-card {
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.4), rgba(255, 204, 0, 0.1));
+            border: 2px solid #ffcc00;
+            border-radius: 20px;
+            padding: 20px 40px;
+            text-align: center;
+            min-width: 250px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .balance-label {
+            color: #aaa;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+        
+        .balance-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #ffcc00;
+        }
+        
+        .balance-value small {
+            font-size: 0.5em;
+            color: #888;
+        }
+        
+        .bank-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .bank-card {
+            background: rgba(30, 30, 50, 0.9);
+            border-radius: 20px;
+            padding: 25px;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .bank-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #ffcc00, #ff9900);
+            transform: scaleX(0);
+            transition: transform 0.3s;
+        }
+        
+        .bank-card:hover {
+            transform: translateY(-5px);
+            border-color: #ffcc00;
+            box-shadow: 0 10px 30px rgba(255, 204, 0, 0.2);
+        }
+        
+        .bank-card:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .card-icon {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+        }
+        
+        .card-title {
+            font-size: 1.5em;
+            color: #ffcc00;
+            margin-bottom: 10px;
+        }
+        
+        .card-desc {
+            color: #aaa;
+            font-size: 0.9em;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+        
+        .input-group {
+            margin-bottom: 15px;
+        }
+        
+        .input-group label {
+            display: block;
+            color: #aaa;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+        
+        .bank-input {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 204, 0, 0.3);
+            border-radius: 10px;
+            padding: 12px;
+            color: white;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+        
+        .bank-input:focus {
+            outline: none;
+            border-color: #ffcc00;
+            box-shadow: 0 0 15px rgba(255, 204, 0, 0.3);
+        }
+        
+        .bank-input::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+        
+        .bank-btn {
+            background: linear-gradient(135deg, #ffcc00, #ff9900);
+            color: black;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 20px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+        }
+        
+        .bank-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(255, 204, 0, 0.4);
+        }
+        
+        .bank-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .bank-btn.secondary {
+            background: linear-gradient(135deg, #4CAF50, #2E7D32);
+            color: white;
+        }
+        
+        .bank-btn.danger {
+            background: linear-gradient(135deg, #ff4444, #cc0000);
+            color: white;
+        }
+        
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .info-label {
+            color: #aaa;
+        }
+        
+        .info-value {
+            color: #ffcc00;
+            font-weight: bold;
+        }
+        
+        .info-value.green {
+            color: #4CAF50;
+        }
+        
+        .info-value.red {
+            color: #ff6666;
+        }
+        
+        .loan-active {
+            background: rgba(255, 68, 68, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255, 68, 68, 0.3);
+        }
+        
+        .crypto-price {
+            font-size: 1.2em;
+            color: #4CAF50;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: rgba(76, 175, 80, 0.1);
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .crypto-chart {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .chart-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+        
+        .chart-label {
+            width: 40px;
+            color: #aaa;
+        }
+        
+        .chart-fill {
+            height: 20px;
+            background: linear-gradient(90deg, #ffcc00, #ff9900);
+            border-radius: 10px;
+            transition: width 0.3s;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .stat-item {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.3em;
+            color: #ffcc00;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            color: #aaa;
+            font-size: 0.8em;
+        }
+        
+        .history-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 15px;
+        }
+        
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s;
+        }
+        
+        .history-item:hover {
+            background: rgba(255, 204, 0, 0.1);
+        }
+        
+        .history-type {
+            color: #ffcc00;
+            font-size: 0.9em;
+        }
+        
+        .history-amount {
+            font-weight: bold;
+        }
+        
+        .history-amount.positive {
+            color: #4CAF50;
+        }
+        
+        .history-amount.negative {
+            color: #ff6666;
+        }
+        
+        .history-time {
+            color: #aaa;
+            font-size: 0.8em;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(30, 30, 50, 0.95);
+            border-left: 4px solid #ffcc00;
+            border-radius: 10px;
+            padding: 20px;
+            max-width: 300px;
+            transform: translateX(100%);
+            transition: transform 0.3s;
+            z-index: 1100;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification-title {
+            color: #ffcc00;
+            font-size: 1.1em;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .notification-message {
+            color: #ccc;
+            font-size: 0.95em;
+            line-height: 1.4;
+        }
+        
+        @media (max-width: 768px) {
+            .bank-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .balance-section {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .balance-card {
+                width: 100%;
+            }
+            
+            .back-btn {
+                position: static;
+                margin-bottom: 15px;
+                display: inline-block;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Заголовок -->
+        <div class="header">
+            <a href="game-world.html" class="back-btn">← Назад в игру</a>
+            <h1>🏦 Банк и Криптобиржа</h1>
+            <p>Кредиты, переводы, инвестиции в криптовалюту</p>
+        </div>
+        
+        <!-- Баланс пользователя -->
+        <div class="balance-section">
+            <div class="balance-card">
+                <div class="balance-label">💰 Деньги</div>
+                <div class="balance-value" id="moneyDisplay">0 ₽</div>
+            </div>
+            <div class="balance-card">
+                <div class="balance-label">₿ Криптовалюта (BTC)</div>
+                <div class="balance-value" id="cryptoDisplay">0 BTC</div>
+            </div>
+        </div>
+        
+        <!-- Основная сетка банковских услуг -->
+        <div class="bank-grid">
+            <!-- Кредиты -->
+            <div class="bank-card">
+                <div class="card-icon">💳</div>
+                <div class="card-title">Кредиты</div>
+                <div class="card-desc">Возьмите кредит под 15% годовых или погасите существующий</div>
+                
+                <div id="loanInfo" class="loan-active" style="display: none;">
+                    <div class="info-row">
+                        <span class="info-label">Активный кредит:</span>
+                        <span class="info-value" id="loanAmount">0 ₽</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Долг с процентами:</span>
+                        <span class="info-value red" id="loanTotal">0 ₽</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Срок погашения:</span>
+                        <span class="info-value" id="loanDate">-</span>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label>Сумма кредита (₽)</label>
+                    <input type="number" id="loanAmountInput" class="bank-input" placeholder="Введите сумму" min="1000" max="1000000">
+                </div>
+                
+                <div class="info-row">
+                    <span class="info-label">Процентная ставка:</span>
+                    <span class="info-value">15% годовых</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Срок кредита:</span>
+                    <span class="info-value">30 дней</span>
+                </div>
+                
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button class="bank-btn" onclick="takeLoan()" id="takeLoanBtn">Взять кредит</button>
+                    <button class="bank-btn secondary" onclick="repayLoan()" id="repayLoanBtn" style="display: none;">Погасить кредит</button>
+                </div>
+            </div>
+            
+            <!-- Переводы -->
+            <div class="bank-card">
+                <div class="card-icon">💸</div>
+                <div class="card-title">Переводы</div>
+                <div class="card-desc">Мгновенные переводы другим игрокам без комиссии</div>
+                
+                <div class="input-group">
+                    <label>Получатель (ID или ник)</label>
+                    <input type="text" id="recipientInput" class="bank-input" placeholder="Введите ник получателя">
+                </div>
+                
+                <div class="input-group">
+                    <label>Сумма перевода (₽)</label>
+                    <input type="number" id="transferAmountInput" class="bank-input" placeholder="Введите сумму" min="1">
+                </div>
+                
+                <button class="bank-btn" onclick="transferMoney()">Перевести деньги</button>
+                
+                <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
+                    <div class="info-row">
+                        <span class="info-label">Комиссия:</span>
+                        <span class="info-value green">0%</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Лимит перевода:</span>
+                        <span class="info-value">1 000 000 ₽</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Криптобиржа -->
+            <div class="bank-card">
+                <div class="card-icon">₿</div>
+                <div class="card-title">Криптобиржа</div>
+                <div class="card-desc">Покупайте и продавайте Bitcoin. Цена меняется каждую минуту</div>
+                
+                <div class="crypto-price" id="btcPrice">1 BTC = 0 ₽</div>
+                
+                <div class="crypto-chart">
+                    <div class="chart-bar">
+                        <span class="chart-label">1ч</span>
+                        <div class="chart-fill" id="chart1h" style="width: 50%"></div>
+                    </div>
+                    <div class="chart-bar">
+                        <span class="chart-label">24ч</span>
+                        <div class="chart-fill" id="chart24h" style="width: 50%"></div>
+                    </div>
+                    <div class="chart-bar">
+                        <span class="chart-label">7д</span>
+                        <div class="chart-fill" id="chart7d" style="width: 50%"></div>
+                    </div>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-value" id="change1h">0%</div>
+                        <div class="stat-label">За 1 час</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="change24h">0%</div>
+                        <div class="stat-label">За 24ч</div>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label>Количество BTC</label>
+                    <input type="number" id="cryptoAmountInput" class="bank-input" placeholder="0.00000000" step="0.00000001" min="0.00000001">
+                </div>
+                
+                <div class="info-row">
+                    <span class="info-label">Стоимость:</span>
+                    <span class="info-value" id="cryptoCost">0 ₽</span>
+                </div>
+                
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button class="bank-btn" onclick="buyCrypto()">💰 Купить BTC</button>
+                    <button class="bank-btn secondary" onclick="sellCrypto()">💱 Продать BTC</button>
+                </div>
+            </div>
+            
+            <!-- Портфель и статистика -->
+            <div class="bank-card">
+                <div class="card-icon">📊</div>
+                <div class="card-title">Мой портфель</div>
+                <div class="card-desc">Статистика ваших инвестиций</div>
+                
+                <div class="info-row">
+                    <span class="info-label">Всего активов:</span>
+                    <span class="info-value" id="totalAssets">0 ₽</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">В криптовалюте:</span>
+                    <span class="info-value" id="cryptoValue">0 ₽</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Прибыль/Убыток:</span>
+                    <span class="info-value" id="profitLoss">0 ₽</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">ROI:</span>
+                    <span class="info-value" id="roi">0%</span>
+                </div>
+                
+                <div style="margin-top: 20px;">
+                    <h3 style="color: #ffcc00; margin-bottom: 10px;">История операций</h3>
+                    <div class="history-list" id="historyList">
+                        <!-- Сюда будут добавляться операции -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Уведомления -->
+    <div class="notification" id="notification">
+        <div class="notification-title">
+            <span id="notificationIcon">🏦</span>
+            <span id="notificationTitle">Уведомление</span>
+        </div>
+        <div class="notification-message" id="notificationMessage"></div>
+    </div>
+    
+    <script>
+        // ========== ГЛОБАЛЬНЫЕ ДАННЫЕ ==========
+        let activeCharacter = null;
+        let characterStats = {};
+        let bankData = {
+            loan: {
+                active: false,
+                amount: 0,
+                totalToRepay: 0,
+                dateTaken: null,
+                dueDate: null
+            },
+            crypto: {
+                balance: 0,
+                price: 45000, // начальная цена BTC
+                history: [],
+                lastUpdate: Date.now()
+            },
+            transactions: []
+        };
+        
+        // ========== ЗАГРУЗКА ДАННЫХ ==========
+        function loadData() {
+            // Загружаем активного персонажа
+            const savedCharacter = localStorage.getItem('activeCharacter');
+            if (savedCharacter) {
+                try {
+                    activeCharacter = JSON.parse(savedCharacter);
+                } catch (e) {
+                    console.error('Ошибка загрузки персонажа:', e);
+                }
+            }
+            
+            if (!activeCharacter) {
+                showNotification('❌ Ошибка', 'Персонаж не выбран', '❌');
+                setTimeout(() => window.location.href = 'index.html', 2000);
+                return false;
+            }
+            
+            // Загружаем статистику персонажа
+            const statsKey = `characterStats_${activeCharacter.id}`;
+            const savedStats = localStorage.getItem(statsKey);
+            
+            if (savedStats) {
+                try {
+                    characterStats = JSON.parse(savedStats);
+                } catch (e) {
+                    createDefaultStats();
+                }
+            } else {
+                const oldStats = localStorage.getItem('characterStats');
+                if (oldStats) {
+                    try {
+                        characterStats = JSON.parse(oldStats);
+                    } catch (e) {
+                        createDefaultStats();
+                    }
+                } else {
+                    createDefaultStats();
+                }
+            }
+            
+            // Загружаем банковские данные
+            const bankKey = `bankData_${activeCharacter.id}`;
+            const savedBank = localStorage.getItem(bankKey);
+            
+            if (savedBank) {
+                try {
+                    bankData = JSON.parse(savedBank);
+                } catch (e) {
+                    initBankData();
+                }
+            } else {
+                initBankData();
+            }
+            
+            // Инициализируем историю транзакций, если её нет
+            if (!bankData.transactions) bankData.transactions = [];
+            
+            updateUI();
+            startCryptoSimulation();
+            return true;
+        }
+        
+        function createDefaultStats() {
+            characterStats = {
+                money: 10000,
+                energy: 100,
+                maxEnergy: 100,
+                strength: 10,
+                level: 1
+            };
+        }
+        
+        function initBankData() {
+            bankData = {
+                loan: {
+                    active: false,
+                    amount: 0,
+                    totalToRepay: 0,
+                    dateTaken: null,
+                    dueDate: null
+                },
+                crypto: {
+                    balance: 0,
+                    price: 45000,
+                    history: [45000, 45200, 44800, 45500, 45300, 44900, 45100],
+                    lastUpdate: Date.now()
+                },
+                transactions: []
+            };
+        }
+        
+        // ========== СОХРАНЕНИЕ ==========
+        function saveData() {
+            if (!activeCharacter || !activeCharacter.id) return;
+            
+            // Сохраняем статистику персонажа
+            const statsKey = `characterStats_${activeCharacter.id}`;
+            localStorage.setItem(statsKey, JSON.stringify(characterStats));
+            localStorage.setItem('characterStats', JSON.stringify(characterStats));
+            
+            // Сохраняем банковские данные
+            const bankKey = `bankData_${activeCharacter.id}`;
+            localStorage.setItem(bankKey, JSON.stringify(bankData));
+        }
+        
+        // ========== ОБНОВЛЕНИЕ ИНТЕРФЕЙСА ==========
+        function updateUI() {
+            if (!characterStats) return;
+            
+            document.getElementById('moneyDisplay').textContent = (characterStats.money || 0).toLocaleString() + ' ₽';
+            document.getElementById('cryptoDisplay').textContent = (bankData.crypto.balance || 0).toFixed(8) + ' BTC';
+            
+            // Обновляем цену BTC
+            const btcPrice = bankData.crypto.price || 45000;
+            document.getElementById('btcPrice').textContent = `1 BTC = ${btcPrice.toLocaleString()} ₽`;
+            
+            // Обновляем информацию о кредите
+            if (bankData.loan && bankData.loan.active) {
+                document.getElementById('loanInfo').style.display = 'block';
+                document.getElementById('loanAmount').textContent = bankData.loan.amount.toLocaleString() + ' ₽';
+                document.getElementById('loanTotal').textContent = bankData.loan.totalToRepay.toLocaleString() + ' ₽';
+                
+                if (bankData.loan.dueDate) {
+                    const dueDate = new Date(bankData.loan.dueDate);
+                    document.getElementById('loanDate').textContent = dueDate.toLocaleDateString();
+                }
+                
+                document.getElementById('takeLoanBtn').style.display = 'none';
+                document.getElementById('repayLoanBtn').style.display = 'block';
+            } else {
+                document.getElementById('loanInfo').style.display = 'none';
+                document.getElementById('takeLoanBtn').style.display = 'block';
+                document.getElementById('repayLoanBtn').style.display = 'none';
+            }
+            
+            // Обновляем стоимость ввода крипты
+            updateCryptoCost();
+            
+            // Обновляем портфель
+            updatePortfolio();
+            
+            // Обновляем историю транзакций
+            updateTransactionHistory();
+            
+            // Обновляем графики
+            updateCharts();
+        }
+        
+        // ========== КРИПТОВАЛЮТА ==========
+        function startCryptoSimulation() {
+            // Обновляем цену каждые 30-60 секунд
+            setInterval(() => {
+                const oldPrice = bankData.crypto.price;
+                const change = (Math.random() - 0.5) * 0.06; // -3% до +3%
+                const newPrice = Math.max(10000, oldPrice * (1 + change));
+                
+                bankData.crypto.price = Math.round(newPrice);
+                bankData.crypto.history.push(bankData.crypto.price);
+                if (bankData.crypto.history.length > 20) {
+                    bankData.crypto.history.shift();
+                }
+                bankData.crypto.lastUpdate = Date.now();
+                
+                updateUI();
+                saveData();
+                
+                // Показываем уведомление при значительном изменении
+                const percentChange = ((newPrice - oldPrice) / oldPrice * 100).toFixed(1);
+                if (Math.abs(percentChange) > 2) {
+                    showNotification(
+                        '₿ Курс BTC изменился',
+                        `${percentChange > 0 ? '📈' : '📉'} ${percentChange}% (${newPrice.toLocaleString()} ₽)`,
+                        '₿'
+                    );
+                }
+            }, 30000 + Math.random() * 30000); // 30-60 секунд
+        }
+        
+        function updateCryptoCost() {
+            const amount = parseFloat(document.getElementById('cryptoAmountInput').value) || 0;
+            const cost = amount * (bankData.crypto.price || 45000);
+            document.getElementById('cryptoCost').textContent = Math.round(cost).toLocaleString() + ' ₽';
+        }
+        
+        function buyCrypto() {
+            const amount = parseFloat(document.getElementById('cryptoAmountInput').value);
+            if (!amount || amount <= 0) {
+                showNotification('❌ Ошибка', 'Введите корректное количество BTC', '❌');
+                return;
+            }
+            
+            const cost = amount * bankData.crypto.price;
+            
+            if (characterStats.money < cost) {
+                showNotification('❌ Недостаточно средств', 
+                    `Нужно ${Math.round(cost).toLocaleString()} ₽`, '💰');
+                return;
+            }
+            
+            characterStats.money -= cost;
+            bankData.crypto.balance = (bankData.crypto.balance || 0) + amount;
+            
+            // Добавляем транзакцию
+            bankData.transactions.push({
+                type: 'Покупка BTC',
+                amount: amount,
+                price: bankData.crypto.price,
+                total: cost,
+                time: Date.now()
+            });
+            
+            saveData();
+            updateUI();
+            
+            showNotification('✅ Покупка выполнена', 
+                `Куплено ${amount.toFixed(8)} BTC за ${Math.round(cost).toLocaleString()} ₽`, '₿');
+        }
+        
+        function sellCrypto() {
+            const amount = parseFloat(document.getElementById('cryptoAmountInput').value);
+            if (!amount || amount <= 0) {
+                showNotification('❌ Ошибка', 'Введите корректное количество BTC', '❌');
+                return;
+            }
+            
+            if ((bankData.crypto.balance || 0) < amount) {
+                showNotification('❌ Недостаточно BTC', 
+                    `У вас ${(bankData.crypto.balance || 0).toFixed(8)} BTC`, '₿');
+                return;
+            }
+            
+            const revenue = amount * bankData.crypto.price;
+            
+            bankData.crypto.balance -= amount;
+            characterStats.money += revenue;
+            
+            // Добавляем транзакцию
+            bankData.transactions.push({
+                type: 'Продажа BTC',
+                amount: amount,
+                price: bankData.crypto.price,
+                total: revenue,
+                time: Date.now()
+            });
+            
+            saveData();
+            updateUI();
+            
+            showNotification('✅ Продажа выполнена', 
+                `Продано ${amount.toFixed(8)} BTC за ${Math.round(revenue).toLocaleString()} ₽`, '💰');
+        }
+        
+        // ========== КРЕДИТЫ ==========
+        function takeLoan() {
+            const amount = parseInt(document.getElementById('loanAmountInput').value);
+            
+            if (!amount || amount < 1000) {
+                showNotification('❌ Ошибка', 'Минимальная сумма кредита 1000 ₽', '❌');
+                return;
+            }
+            
+            if (amount > 1000000) {
+                showNotification('❌ Ошибка', 'Максимальная сумма кредита 1 000 000 ₽', '❌');
+                return;
+            }
+            
+            if (bankData.loan && bankData.loan.active) {
+                showNotification('❌ Ошибка', 'У вас уже есть активный кредит', '❌');
+                return;
+            }
+            
+            const interest = amount * 0.15; // 15% годовых
+            const totalToRepay = amount + interest;
+            
+            const now = Date.now();
+            const dueDate = now + (30 * 24 * 60 * 60 * 1000); // 30 дней
+            
+            bankData.loan = {
+                active: true,
+                amount: amount,
+                totalToRepay: totalToRepay,
+                dateTaken: now,
+                dueDate: dueDate
+            };
+            
+            characterStats.money += amount;
+            
+            bankData.transactions.push({
+                type: 'Получение кредита',
+                amount: amount,
+                total: amount,
+                time: now
+            });
+            
+            saveData();
+            updateUI();
+            
+            showNotification('✅ Кредит получен', 
+                `Вы получили ${amount.toLocaleString()} ₽. Нужно вернуть ${Math.round(totalToRepay).toLocaleString()} ₽ через 30 дней`, '💰');
+        }
+        
+        function repayLoan() {
+            if (!bankData.loan || !bankData.loan.active) {
+                showNotification('❌ Ошибка', 'У вас нет активного кредита', '❌');
+                return;
+            }
+            
+            const totalToRepay = bankData.loan.totalToRepay;
+            
+            if (characterStats.money < totalToRepay) {
+                showNotification('❌ Недостаточно средств', 
+                    `Нужно ${Math.round(totalToRepay).toLocaleString()} ₽`, '💰');
+                return;
+            }
+            
+            characterStats.money -= totalToRepay;
+            
+            bankData.transactions.push({
+                type: 'Погашение кредита',
+                amount: totalToRepay,
+                total: totalToRepay,
+                time: Date.now()
+            });
+            
+            bankData.loan.active = false;
+            
+            saveData();
+            updateUI();
+            
+            showNotification('✅ Кредит погашен', 
+                `Вы успешно погасили кредит. Спасибо за своевременную оплату!`, '🏦');
+        }
+        
+        // ========== ПЕРЕВОДЫ ==========
+        function transferMoney() {
+            const recipientName = document.getElementById('recipientInput').value.trim();
+            const amount = parseInt(document.getElementById('transferAmountInput').value);
+            
+            if (!recipientName) {
+                showNotification('❌ Ошибка', 'Введите имя получателя', '❌');
+                return;
+            }
+            
+            if (!amount || amount <= 0) {
+                showNotification('❌ Ошибка', 'Введите корректную сумму', '❌');
+                return;
+            }
+            
+            if (amount > 1000000) {
+                showNotification('❌ Ошибка', 'Максимальная сумма перевода 1 000 000 ₽', '❌');
+                return;
+            }
+            
+            if (characterStats.money < amount) {
+                showNotification('❌ Недостаточно средств', 
+                    `У вас ${characterStats.money.toLocaleString()} ₽`, '💰');
+                return;
+            }
+            
+            // Ищем получателя в localStorage
+            const recipient = findCharacterByName(recipientName);
+            
+            if (!recipient) {
+                showNotification('❌ Ошибка', 'Получатель не найден', '❌');
+                return;
+            }
+            
+            // Списываем деньги у отправителя
+            characterStats.money -= amount;
+            
+            // Начисляем деньги получателю
+            const recipientStatsKey = `characterStats_${recipient.id}`;
+            let recipientStats = JSON.parse(localStorage.getItem(recipientStatsKey) || '{"money":0}');
+            recipientStats.money = (recipientStats.money || 0) + amount;
+            localStorage.setItem(recipientStatsKey, JSON.stringify(recipientStats));
+            
+            // Добавляем транзакцию
+            bankData.transactions.push({
+                type: 'Перевод',
+                to: recipient.name,
+                amount: amount,
+                total: amount,
+                time: Date.now()
+            });
+            
+            saveData();
+            updateUI();
+            
+            showNotification('✅ Перевод выполнен', 
+                `Вы перевели ${amount.toLocaleString()} ₽ игроку ${recipient.name}`, '💸');
+        }
+        
+        function findCharacterByName(name) {
+            try {
+                // Ищем в базе персонажей
+                const db = JSON.parse(localStorage.getItem('character_creator_db') || '{"characters":[]}');
+                const characters = db.characters || [];
+                
+                return characters.find(c => 
+                    c.name && c.name.toLowerCase() === name.toLowerCase()
+                );
+            } catch (e) {
+                console.error('Ошибка поиска персонажа:', e);
+                return null;
+            }
+        }
+        
+        // ========== ПОРТФЕЛЬ ==========
+        function updatePortfolio() {
+            const money = characterStats.money || 0;
+            const cryptoBalance = bankData.crypto.balance || 0;
+            const cryptoPrice = bankData.crypto.price || 45000;
+            const cryptoValue = cryptoBalance * cryptoPrice;
+            
+            const totalAssets = money + cryptoValue;
+            document.getElementById('totalAssets').textContent = Math.round(totalAssets).toLocaleString() + ' ₽';
+            document.getElementById('cryptoValue').textContent = Math.round(cryptoValue).toLocaleString() + ' ₽';
+            
+            // Расчет прибыли (упрощенно - от первой транзакции)
+            const firstCryptoTx = bankData.transactions.find(t => t.type === 'Покупка BTC');
+            if (firstCryptoTx && cryptoBalance > 0) {
+                const avgPrice = firstCryptoTx.price || cryptoPrice;
+                const profit = (cryptoPrice - avgPrice) * cryptoBalance;
+                document.getElementById('profitLoss').textContent = (profit > 0 ? '+' : '') + Math.round(profit).toLocaleString() + ' ₽';
+                document.getElementById('profitLoss').className = 'info-value ' + (profit >= 0 ? 'green' : 'red');
+                
+                const roi = (profit / (avgPrice * cryptoBalance) * 100) || 0;
+                document.getElementById('roi').textContent = (roi > 0 ? '+' : '') + roi.toFixed(1) + '%';
+                document.getElementById('roi').className = 'info-value ' + (roi >= 0 ? 'green' : 'red');
+            } else {
+                document.getElementById('profitLoss').textContent = '0 ₽';
+                document.getElementById('roi').textContent = '0%';
+            }
+        }
+        
+        // ========== ИСТОРИЯ ТРАНЗАКЦИЙ ==========
+        function updateTransactionHistory() {
+            const historyList = document.getElementById('historyList');
+            const transactions = bankData.transactions || [];
+            
+            if (transactions.length === 0) {
+                historyList.innerHTML = '<div style="text-align: center; color: #aaa; padding: 20px;">История операций пуста</div>';
+                return;
+            }
+            
+            let html = '';
+            transactions.slice(-10).reverse().forEach(t => {
+                const date = new Date(t.time);
+                const timeStr = date.toLocaleString();
+                
+                let amountClass = 'history-amount';
+                if (t.type === 'Покупка BTC' || t.type === 'Получение кредита') {
+                    amountClass += ' positive';
+                } else if (t.type === 'Продажа BTC' || t.type === 'Погашение кредита') {
+                    amountClass += ' positive';
+                } else if (t.type === 'Перевод') {
+                    amountClass += ' negative';
+                }
+                
+                html += `
+                    <div class="history-item">
+                        <div>
+                            <span class="history-type">${t.type}</span>
+                            ${t.to ? `<span style="color: #aaa;"> → ${t.to}</span>` : ''}
+                            <div class="history-time">${timeStr}</div>
+                        </div>
+                        <div class="${amountClass}">
+                            ${t.type.includes('Продажа') || t.type.includes('Погашение') ? '' : '+'}${Math.round(t.amount).toLocaleString()} ₽
+                        </div>
+                    </div>
+                `;
+            });
+            
+            historyList.innerHTML = html;
+        }
+        
+        // ========== ГРАФИКИ ==========
+        function updateCharts() {
+            const history = bankData.crypto.history || [bankData.crypto.price];
+            const currentPrice = bankData.crypto.price;
+            
+            if (history.length > 0) {
+                // Изменение за 1 час (последние 2 значения)
+                const price1hAgo = history[Math.max(0, history.length - 2)] || currentPrice;
+                const change1h = ((currentPrice - price1hAgo) / price1hAgo * 100).toFixed(1);
+                document.getElementById('change1h').textContent = (change1h > 0 ? '+' : '') + change1h + '%';
+                document.getElementById('change1h').className = 'stat-value ' + (change1h >= 0 ? 'green' : 'red');
+                
+                // Изменение за 24ч (первое значение)
+                const price24hAgo = history[0] || currentPrice;
+                const change24h = ((currentPrice - price24hAgo) / price24hAgo * 100).toFixed(1);
+                document.getElementById('change24h').textContent = (change24h > 0 ? '+' : '') + change24h + '%';
+                document.getElementById('change24h').className = 'stat-value ' + (change24h >= 0 ? 'green' : 'red');
+                
+                // Графические бары
+                const maxPrice = Math.max(...history, currentPrice) * 1.1;
+                const minPrice = Math.min(...history, currentPrice) * 0.9;
+                const range = maxPrice - minPrice;
+                
+                if (range > 0) {
+                    document.getElementById('chart1h').style.width = ((price1hAgo - minPrice) / range * 100) + '%';
+                    document.getElementById('chart24h').style.width = ((price24hAgo - minPrice) / range * 100) + '%';
+                    document.getElementById('chart7d').style.width = ((currentPrice - minPrice) / range * 100) + '%';
+                }
+            }
+        }
+        
+        // ========== УВЕДОМЛЕНИЯ ==========
+        function showNotification(title, message, icon = '🏦') {
+            const notification = document.getElementById('notification');
+            document.getElementById('notificationIcon').textContent = icon;
+            document.getElementById('notificationTitle').textContent = title;
+            document.getElementById('notificationMessage').textContent = message;
+            
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        // ========== ИНИЦИАЛИЗАЦИЯ ==========
+        document.addEventListener('DOMContentLoaded', function() {
+            if (loadData()) {
+                updateUI();
+                
+                // Обновление стоимости при вводе
+                document.getElementById('cryptoAmountInput').addEventListener('input', updateCryptoCost);
+                
+                // Автосохранение каждые 30 секунд
+                setInterval(saveData, 30000);
+            }
+        });
+        
+        window.addEventListener('beforeunload', function() {
+            saveData();
+        });
+    </script>
+</body>
+</html>

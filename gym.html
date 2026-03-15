@@ -1,0 +1,1353 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Спорт зал - Тренировки и сила</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+            color: white;
+            font-family: 'Arial', sans-serif;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Шапка */
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+            background: rgba(20, 20, 40, 0.7);
+            border-radius: 20px;
+            border: 2px solid #FF3D00;
+            box-shadow: 0 10px 30px rgba(255, 61, 0, 0.1);
+            position: relative;
+        }
+        
+        .back-btn {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 0.95em;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid rgba(255, 61, 0, 0.3);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .back-btn:hover {
+            background: rgba(255, 61, 0, 0.2);
+            border-color: #FF3D00;
+            transform: translateX(-5px);
+        }
+        
+        .header h1 {
+            color: #FF3D00;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(255, 61, 0, 0.3);
+        }
+        
+        .header p {
+            color: #aaa;
+            font-size: 1.1em;
+        }
+        
+        /* Статистика персонажа */
+        .stats-panel {
+            background: rgba(30, 30, 50, 0.9);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 2px solid #FF3D00;
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            gap: 30px;
+        }
+        
+        .character-avatar {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #FF3D00, #FF6E40);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3em;
+            border: 3px solid #FF3D00;
+            box-shadow: 0 5px 20px rgba(255, 61, 0, 0.3);
+        }
+        
+        .character-stats {
+            flex: 1;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
+        }
+        
+        .stat-item {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 61, 0, 0.2);
+            transition: all 0.3s;
+        }
+        
+        .stat-item:hover {
+            transform: translateY(-5px);
+            border-color: #FF3D00;
+            box-shadow: 0 5px 15px rgba(255, 61, 0, 0.2);
+        }
+        
+        .stat-label {
+            font-size: 0.9em;
+            color: #aaa;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .stat-value {
+            font-size: 1.6em;
+            font-weight: bold;
+            color: #FF3D00;
+        }
+        
+        .stat-sub {
+            font-size: 0.8em;
+            color: #888;
+            margin-left: 5px;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #FF3D00, #FF6E40);
+            border-radius: 4px;
+            transition: width 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            animation: shimmer 2s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+        
+        /* Секции тренировок */
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .section-title h2 {
+            color: #FF3D00;
+            font-size: 1.8em;
+            text-shadow: 0 2px 5px rgba(255, 61, 0, 0.3);
+        }
+        
+        .title-icon {
+            font-size: 2em;
+        }
+        
+        .training-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        /* Карточки тренировок */
+        .training-card {
+            background: rgba(40, 40, 60, 0.9);
+            border-radius: 25px;
+            padding: 25px;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .training-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #FF3D00, #FF6E40);
+            transform: scaleX(0);
+            transition: transform 0.3s;
+        }
+        
+        .training-card:hover {
+            transform: translateY(-10px);
+            border-color: #FF3D00;
+            box-shadow: 0 15px 30px rgba(255, 61, 0, 0.2);
+        }
+        
+        .training-card:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .card-icon {
+            font-size: 2.8em;
+            color: #FF3D00;
+            filter: drop-shadow(0 5px 10px rgba(255, 61, 0, 0.3));
+        }
+        
+        .card-title {
+            font-size: 1.5em;
+            color: #FF3D00;
+            font-weight: bold;
+        }
+        
+        .card-description {
+            color: #ccc;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        
+        .card-stats {
+            background: rgba(255, 61, 0, 0.1);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid rgba(255, 61, 0, 0.3);
+        }
+        
+        .cost {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #ff6666;
+        }
+        
+        .reward {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #4CAF50;
+        }
+        
+        .train-btn {
+            background: linear-gradient(135deg, #FF3D00, #FF6E40);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            padding: 15px 25px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .train-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 61, 0, 0.4);
+        }
+        
+        .train-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        /* Мини-игры */
+        .mini-game-section {
+            background: rgba(30, 30, 50, 0.9);
+            border-radius: 25px;
+            padding: 30px;
+            margin-bottom: 40px;
+            border: 2px solid #FF3D00;
+        }
+        
+        .mini-game-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 25px;
+        }
+        
+        .mini-game-card {
+            background: rgba(50, 50, 70, 0.8);
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+        
+        .mini-game-card:hover {
+            transform: scale(1.05);
+            border-color: #FF3D00;
+            box-shadow: 0 10px 25px rgba(255, 61, 0, 0.2);
+        }
+        
+        .mini-game-icon {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+        }
+        
+        .mini-game-title {
+            font-size: 1.3em;
+            color: #FF3D00;
+            margin-bottom: 10px;
+        }
+        
+        .mini-game-desc {
+            color: #ccc;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+        }
+        
+        .mini-game-reward {
+            background: rgba(255, 61, 0, 0.2);
+            padding: 8px;
+            border-radius: 20px;
+            color: #FF3D00;
+            font-weight: bold;
+        }
+        
+        /* Модальное окно мини-игры */
+        .game-modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border-radius: 25px;
+            padding: 35px;
+            width: 90%;
+            max-width: 600px;
+            z-index: 1001;
+            border: 3px solid #FF3D00;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        }
+        
+        .game-modal.show {
+            display: block;
+            animation: modalPop 0.3s ease-out;
+        }
+        
+        @keyframes modalPop {
+            from { opacity: 0; transform: translate(-50%, -60%); }
+            to { opacity: 1; transform: translate(-50%, -50%); }
+        }
+        
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+        
+        .overlay.show {
+            display: block;
+        }
+        
+        /* Игровые элементы */
+        .game-area {
+            text-align: center;
+            margin: 25px 0;
+        }
+        
+        .click-target {
+            width: 150px;
+            height: 150px;
+            background: linear-gradient(135deg, #FF3D00, #FF6E40);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            color: white;
+            cursor: pointer;
+            margin: 20px auto;
+            transition: all 0.1s;
+            box-shadow: 0 10px 30px rgba(255, 61, 0, 0.5);
+        }
+        
+        .click-target:active {
+            transform: scale(0.9);
+        }
+        
+        .game-timer {
+            font-size: 2em;
+            color: #FF3D00;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+        
+        .game-score {
+            font-size: 1.5em;
+            color: #fff;
+            margin: 15px 0;
+        }
+        
+        .strength-bar {
+            width: 100%;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .strength-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #FF3D00, #FF6E40);
+            border-radius: 10px;
+            transition: width 0.3s;
+        }
+        
+        /* Уведомления */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(30, 30, 50, 0.95);
+            border-left: 4px solid #FF3D00;
+            border-radius: 10px;
+            padding: 20px;
+            max-width: 300px;
+            transform: translateX(100%);
+            transition: transform 0.3s;
+            z-index: 1100;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification-title {
+            color: #FF3D00;
+            font-size: 1.1em;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .stats-panel {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .training-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .back-btn {
+                position: static;
+                margin: 10px 0;
+                display: inline-flex;
+            }
+        }
+        
+        /* Анимация для повышения уровня */
+        @keyframes levelUp {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        
+        .level-up {
+            animation: levelUp 0.5s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <!-- Оверлей -->
+    <div class="overlay" id="overlay"></div>
+    
+    <!-- Уведомления -->
+    <div class="notification" id="notification">
+        <div class="notification-title">
+            <span id="notificationIcon">🏋️</span>
+            <span id="notificationTitle">Спорт зал</span>
+        </div>
+        <div class="notification-message" id="notificationMessage"></div>
+    </div>
+    
+    <!-- Модальное окно для мини-игр -->
+    <div class="game-modal" id="gameModal">
+        <div style="text-align: center; margin-bottom: 20px;">
+            <h2 style="color: #FF3D00;" id="gameModalTitle">🏋️‍♂️ Жим лежа</h2>
+        </div>
+        <div id="gameContent"></div>
+        <button onclick="closeGameModal()" style="
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid #FF3D00;
+            border-radius: 10px;
+            padding: 10px 20px;
+            margin-top: 20px;
+            width: 100%;
+            cursor: pointer;
+            transition: all 0.3s;
+        ">Закрыть</button>
+    </div>
+    
+    <div class="container">
+        <!-- Шапка -->
+        <div class="header">
+            <a href="index.html" class="back-btn">
+                ← Вернуться в город
+            </a>
+            <h1>🏋️‍♂️ СПОРТ ЗАЛ</h1>
+            <p>Тренируй тело, качай силу, становись сильнее!</p>
+        </div>
+        
+        <!-- Статистика персонажа -->
+        <div class="stats-panel">
+            <div class="character-avatar" id="characterAvatar">👤</div>
+            <div class="character-stats">
+                <div class="stat-item">
+                    <div class="stat-label">💪 Сила</div>
+                    <div class="stat-value" id="strengthValue">0</div>
+                    <div class="stat-sub" id="strengthLevel">Уровень 1</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="strengthProgress" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">⚡ Энергия</div>
+                    <div class="stat-value" id="energyValue">0</div>
+                    <div class="stat-sub" id="energyCapacity">Макс: 100</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="energyProgress" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">💰 Деньги</div>
+                    <div class="stat-value" id="moneyValue">0</div>
+                    <div class="stat-sub">₽</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">🏆 Уровень</div>
+                    <div class="stat-value" id="levelValue">1</div>
+                    <div class="stat-sub">персонажа</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Обычные тренировки -->
+        <div class="section-title">
+            <span class="title-icon">💪</span>
+            <h2>Тренировки</h2>
+        </div>
+        
+        <div class="training-grid">
+            <!-- Легкая тренировка -->
+            <div class="training-card">
+                <div class="card-header">
+                    <span class="card-icon">🏋️</span>
+                    <span class="card-title">Легкая тренировка</span>
+                </div>
+                <div class="card-description">
+                    Разминочные упражнения. Подходит для начинающих атлетов.
+                </div>
+                <div class="card-stats">
+                    <div class="cost">
+                        ⚡ 15 энергии
+                    </div>
+                    <div class="reward">
+                        💪 +1-3 силы
+                    </div>
+                </div>
+                <button class="train-btn" onclick="lightWorkout()">
+                    <span>🏋️</span> Тренироваться
+                </button>
+            </div>
+            
+            <!-- Средняя тренировка -->
+            <div class="training-card">
+                <div class="card-header">
+                    <span class="card-icon">🏋️‍♂️</span>
+                    <span class="card-title">Интенсивная тренировка</span>
+                </div>
+                <div class="card-description">
+                    Полноценная тренировка с железом. Отличный результат!
+                </div>
+                <div class="card-stats">
+                    <div class="cost">
+                        ⚡ 30 энергии
+                    </div>
+                    <div class="reward">
+                        💪 +3-6 силы
+                    </div>
+                </div>
+                <button class="train-btn" onclick="mediumWorkout()">
+                    <span>🏋️‍♂️</span> Тренироваться
+                </button>
+            </div>
+            
+            <!-- Тяжелая тренировка -->
+            <div class="training-card">
+                <div class="card-header">
+                    <span class="card-icon">🏋️‍♀️</span>
+                    <span class="card-title">Экстремальная тренировка</span>
+                </div>
+                <div class="card-description">
+                    Тренировка на пределе возможностей. Только для сильных духом!
+                </div>
+                <div class="card-stats">
+                    <div class="cost">
+                        ⚡ 50 энергии + 💰 500
+                    </div>
+                    <div class="reward">
+                        💪 +5-10 силы
+                    </div>
+                </div>
+                <button class="train-btn" onclick="hardWorkout()">
+                    <span>⚡</span> Тренироваться
+                </button>
+            </div>
+        </div>
+        
+        <!-- МИНИ-ИГРЫ -->
+        <div class="mini-game-section">
+            <div class="section-title">
+                <span class="title-icon">🎮</span>
+                <h2>Мини-игры для прокачки силы</h2>
+            </div>
+            <p style="color: #ccc; margin-bottom: 20px;">
+                Испытай себя в специальных испытаниях! Чем лучше результат, тем больше силы ты получишь!
+                <br><span style="color: #FF3D00;">⚡ Каждый уровень силы дает +10 к максимальной энергии!</span>
+            </p>
+            
+            <div class="mini-game-grid">
+                <!-- Игра 1: Жим лежа -->
+                <div class="mini-game-card" onclick="openGame('bench')">
+                    <div class="mini-game-icon">🏋️</div>
+                    <div class="mini-game-title">Жим лежа</div>
+                    <div class="mini-game-desc">
+                        Жми штангу на скорость! Больше повторений - больше силы!
+                    </div>
+                    <div class="mini-game-reward">
+                        💪 +2-8 силы + 🏆 опыт
+                    </div>
+                </div>
+                
+                <!-- Игра 2: Перетягивание каната -->
+                <div class="mini-game-card" onclick="openGame('rope')">
+                    <div class="mini-game-icon">🪢</div>
+                    <div class="mini-game-title">Перетягивание каната</div>
+                    <div class="mini-game-desc">
+                        Перетяни соперника! Твоя сила против силы противника!
+                    </div>
+                    <div class="mini-game-reward">
+                        💪 +3-10 силы + 🎯 удача
+                    </div>
+                </div>
+                
+                <!-- Игра 3: Бег с препятствиями -->
+                <div class="mini-game-card" onclick="openGame('run')">
+                    <div class="mini-game-icon">🏃</div>
+                    <div class="mini-game-title">Полоса препятствий</div>
+                    <div class="mini-game-desc">
+                        Преодолей полосу препятствий за минимальное время!
+                    </div>
+                    <div class="mini-game-reward">
+                        💪 +4-12 силы + ⚡ энергия
+                    </div>
+                </div>
+                
+                <!-- Игра 4: Армрестлинг -->
+                <div class="mini-game-card" onclick="openGame('arm')">
+                    <div class="mini-game-icon">💪</div>
+                    <div class="mini-game-title">Армрестлинг</div>
+                    <div class="mini-game-desc">
+                        Победи чемпиона в армрестлинге и получи титул!
+                    </div>
+                    <div class="mini-game-reward">
+                        💪 +5-15 силы + 💰 бонус
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ========== ЗАГРУЗКА ДАННЫХ ПЕРСОНАЖА ==========
+        let activeCharacter = null;
+        let characterStats = {};
+        
+        // Кулдауны
+        const CD = {
+            lightWorkout: 30,
+            mediumWorkout: 60,
+            hardWorkout: 180
+        };
+        
+        function onCD(action) {
+            let last = localStorage.getItem('cd_gym_' + action);
+            if (!last) return false;
+            let now = Math.floor(Date.now() / 1000);
+            return (now - parseInt(last)) < CD[action];
+        }
+        
+        function timeLeft(action) {
+            let last = localStorage.getItem('cd_gym_' + action);
+            if (!last) return 0;
+            let now = Math.floor(Date.now() / 1000);
+            let left = CD[action] - (now - parseInt(last));
+            return left > 0 ? left : 0;
+        }
+        
+        function setCD(action) {
+            let now = Math.floor(Date.now() / 1000);
+            localStorage.setItem('cd_gym_' + action, now);
+        }
+        
+        function fmtTime(sec) {
+            if (sec >= 60) return Math.floor(sec/60) + 'м ' + (sec%60) + 'с';
+            return sec + 'с';
+        }
+        
+        // Загрузка персонажа
+        function loadActiveCharacter() {
+            const savedCharacter = localStorage.getItem('activeCharacter');
+            if (savedCharacter) {
+                try {
+                    activeCharacter = JSON.parse(savedCharacter);
+                } catch (e) {
+                    console.error('Ошибка загрузки персонажа');
+                }
+            }
+        }
+        
+        // Загрузка статистики
+        function loadCharacterStats() {
+            if (!activeCharacter || !activeCharacter.id) return;
+            
+            const statsKey = `characterStats_${activeCharacter.id}`;
+            const savedStats = localStorage.getItem(statsKey);
+            
+            if (savedStats) {
+                try {
+                    characterStats = JSON.parse(savedStats);
+                } catch (e) {
+                    console.error('Ошибка загрузки статистики');
+                }
+            }
+            
+            // Инициализация полей
+            if (!characterStats.strength) characterStats.strength = 10;
+            if (!characterStats.maxEnergy) characterStats.maxEnergy = 100;
+            if (!characterStats.energy) characterStats.energy = 100;
+            if (!characterStats.money) characterStats.money = 1000;
+            if (!characterStats.level) characterStats.level = 1;
+            if (!characterStats.gymWorkouts) characterStats.gymWorkouts = 0;
+            if (!characterStats.gymRecord) characterStats.gymRecord = 0;
+            if (!characterStats.strengthLevel) characterStats.strengthLevel = 1;
+            
+            // Обновляем максимальную энергию на основе силы
+            updateMaxEnergyFromStrength();
+        }
+        
+        // ========== НОВАЯ ФУНКЦИЯ: ОБНОВЛЕНИЕ МАКСИМАЛЬНОЙ ЭНЕРГИИ ==========
+        function updateMaxEnergyFromStrength() {
+            // Каждые 10 силы = +10 к максимальной энергии
+            // Базовая максимальная энергия: 100 + (уровень силы - 1) * 10
+            let strengthLevel = Math.floor(characterStats.strength / 10) + 1;
+            let baseMaxEnergy = 100;
+            let bonusEnergy = (strengthLevel - 1) * 10;
+            let newMaxEnergy = baseMaxEnergy + bonusEnergy;
+            
+            // Сохраняем уровень силы
+            characterStats.strengthLevel = strengthLevel;
+            
+            // Обновляем максимальную энергию
+            if (newMaxEnergy > characterStats.maxEnergy) {
+                let oldMax = characterStats.maxEnergy;
+                characterStats.maxEnergy = newMaxEnergy;
+                
+                // Также восстанавливаем энергию до нового максимума
+                characterStats.energy += (newMaxEnergy - oldMax);
+                
+                showNotification('⚡ ЭНЕРГИЯ УВЕЛИЧЕНА!', 
+                    `Ваша максимальная энергия увеличилась до ${newMaxEnergy}! (+${newMaxEnergy - oldMax})`, 
+                    '⚡');
+            }
+        }
+        
+        // ========== ФУНКЦИЯ ПРОВЕРКИ ПОВЫШЕНИЯ УРОВНЯ СИЛЫ ==========
+        function checkStrengthLevelUp(oldStrength, newStrength) {
+            let oldLevel = Math.floor(oldStrength / 10) + 1;
+            let newLevel = Math.floor(newStrength / 10) + 1;
+            
+            if (newLevel > oldLevel) {
+                // Получаем бонус за каждый пройденный уровень
+                let levelsGained = newLevel - oldLevel;
+                let oldMaxEnergy = characterStats.maxEnergy;
+                let energyBonus = levelsGained * 10;
+                
+                characterStats.maxEnergy += energyBonus;
+                characterStats.energy += energyBonus; // Восстанавливаем энергию на бонус
+                
+                showNotification('🏆 НОВЫЙ УРОВЕНЬ СИЛЫ!', 
+                    `Поздравляем! Уровень силы: ${oldLevel} → ${newLevel}\n⚡ Макс. энергия +${energyBonus}!`, 
+                    '💪');
+                
+                // Анимация для статистики
+                document.querySelector('.stat-item:first-child').classList.add('level-up');
+                setTimeout(() => {
+                    document.querySelector('.stat-item:first-child').classList.remove('level-up');
+                }, 500);
+                
+                return true;
+            }
+            return false;
+        }
+        
+        // Сохранение статистики
+        function saveCharacterStats() {
+            if (!activeCharacter || !activeCharacter.id) return;
+            const statsKey = `characterStats_${activeCharacter.id}`;
+            localStorage.setItem(statsKey, JSON.stringify(characterStats));
+            localStorage.setItem('characterStats', JSON.stringify(characterStats));
+            updateUI();
+        }
+        
+        // Обновление интерфейса
+        function updateUI() {
+            document.getElementById('strengthValue').textContent = characterStats.strength || 10;
+            
+            // Уровень силы
+            let strengthLevel = Math.floor((characterStats.strength || 10) / 10) + 1;
+            document.getElementById('strengthLevel').innerHTML = `Уровень ${strengthLevel}`;
+            
+            // Энергия
+            document.getElementById('energyValue').textContent = `${characterStats.energy || 0}/${characterStats.maxEnergy || 100}`;
+            document.getElementById('energyCapacity').innerHTML = `Макс: ${characterStats.maxEnergy || 100}`;
+            
+            // Прогресс энергии
+            let energyPercent = ((characterStats.energy || 0) / (characterStats.maxEnergy || 100)) * 100;
+            document.getElementById('energyProgress').style.width = energyPercent + '%';
+            
+            // Деньги и уровень
+            document.getElementById('moneyValue').textContent = (characterStats.money || 0).toLocaleString();
+            document.getElementById('levelValue').textContent = characterStats.level || 1;
+            
+            // Прогресс силы (к следующему уровню силы)
+            let currentStrength = characterStats.strength || 10;
+            let nextLevelThreshold = (Math.floor(currentStrength / 10) + 1) * 10;
+            let strengthProgress = ((currentStrength % 10) / 10) * 100;
+            document.getElementById('strengthProgress').style.width = strengthProgress + '%';
+            
+            updateButtons();
+        }
+        
+        // Обновление кнопок
+        function updateButtons() {
+            let lightBtn = document.querySelectorAll('.train-btn')[0];
+            let mediumBtn = document.querySelectorAll('.train-btn')[1];
+            let hardBtn = document.querySelectorAll('.train-btn')[2];
+            
+            if (lightBtn) {
+                let t = timeLeft('lightWorkout');
+                lightBtn.disabled = t > 0;
+                lightBtn.innerHTML = t > 0 ? '⏳ ' + fmtTime(t) : '<span>🏋️</span> Тренироваться';
+            }
+            
+            if (mediumBtn) {
+                let t = timeLeft('mediumWorkout');
+                mediumBtn.disabled = t > 0;
+                mediumBtn.innerHTML = t > 0 ? '⏳ ' + fmtTime(t) : '<span>🏋️‍♂️</span> Тренироваться';
+            }
+            
+            if (hardBtn) {
+                let t = timeLeft('hardWorkout');
+                hardBtn.disabled = t > 0;
+                hardBtn.innerHTML = t > 0 ? '⏳ ' + fmtTime(t) : '<span>⚡</span> Тренироваться';
+            }
+        }
+        
+        // ========== ТРЕНИРОВКИ ==========
+        function lightWorkout() {
+            if (onCD('lightWorkout')) {
+                showNotification('⏳ Отдых', `Отдыхай! Осталось: ${fmtTime(timeLeft('lightWorkout'))}`, '⏳');
+                return;
+            }
+            
+            if (characterStats.energy < 15) {
+                showNotification('❌ Нет энергии', 'Нужно 15 энергии для тренировки', '⚡');
+                return;
+            }
+            
+            characterStats.energy -= 15;
+            let oldStrength = characterStats.strength;
+            let gain = Math.floor(Math.random() * 3) + 1; // 1-3 силы
+            characterStats.strength += gain;
+            characterStats.gymWorkouts = (characterStats.gymWorkouts || 0) + 1;
+            
+            if (gain > (characterStats.gymRecord || 0)) {
+                characterStats.gymRecord = gain;
+            }
+            
+            // Проверяем повышение уровня силы
+            checkStrengthLevelUp(oldStrength, characterStats.strength);
+            
+            setCD('lightWorkout');
+            saveCharacterStats();
+            showNotification('✅ Тренировка завершена!', `Вы получили +${gain} силы!`, '💪');
+        }
+        
+        function mediumWorkout() {
+            if (onCD('mediumWorkout')) {
+                showNotification('⏳ Отдых', `Осталось: ${fmtTime(timeLeft('mediumWorkout'))}`, '⏳');
+                return;
+            }
+            
+            if (characterStats.energy < 30) {
+                showNotification('❌ Нет энергии', 'Нужно 30 энергии для тренировки', '⚡');
+                return;
+            }
+            
+            characterStats.energy -= 30;
+            let oldStrength = characterStats.strength;
+            let gain = Math.floor(Math.random() * 4) + 3; // 3-6 силы
+            characterStats.strength += gain;
+            characterStats.gymWorkouts = (characterStats.gymWorkouts || 0) + 1;
+            
+            if (gain > (characterStats.gymRecord || 0)) {
+                characterStats.gymRecord = gain;
+            }
+            
+            // Проверяем повышение уровня силы
+            checkStrengthLevelUp(oldStrength, characterStats.strength);
+            
+            setCD('mediumWorkout');
+            saveCharacterStats();
+            showNotification('🔥 Отличная тренировка!', `Вы получили +${gain} силы!`, '💪');
+        }
+        
+        function hardWorkout() {
+            if (onCD('hardWorkout')) {
+                showNotification('⏳ Отдых', `Осталось: ${fmtTime(timeLeft('hardWorkout'))}`, '⏳');
+                return;
+            }
+            
+            if (characterStats.energy < 50) {
+                showNotification('❌ Нет энергии', 'Нужно 50 энергии для тренировки', '⚡');
+                return;
+            }
+            
+            if (characterStats.money < 500) {
+                showNotification('❌ Нет денег', 'Нужно 500 ₽ для тренировки', '💰');
+                return;
+            }
+            
+            characterStats.energy -= 50;
+            characterStats.money -= 500;
+            let oldStrength = characterStats.strength;
+            let gain = Math.floor(Math.random() * 6) + 5; // 5-10 силы
+            characterStats.strength += gain;
+            characterStats.gymWorkouts = (characterStats.gymWorkouts || 0) + 1;
+            
+            if (gain > (characterStats.gymRecord || 0)) {
+                characterStats.gymRecord = gain;
+            }
+            
+            // Проверяем повышение уровня силы
+            checkStrengthLevelUp(oldStrength, characterStats.strength);
+            
+            setCD('hardWorkout');
+            saveCharacterStats();
+            showNotification('⚡ ЭКСТРИМ!', `Вы получили +${gain} силы!`, '🏆');
+        }
+        
+        // ========== МИНИ-ИГРЫ ==========
+        let currentGame = null;
+        let gameScore = 0;
+        let gameTimer = null;
+        let gameTimeLeft = 0;
+        
+        function openGame(gameType) {
+            currentGame = gameType;
+            
+            if (characterStats.energy < 20) {
+                showNotification('❌ Нет энергии', 'Для мини-игр нужно 20 энергии', '⚡');
+                return;
+            }
+            
+            characterStats.energy -= 20;
+            saveCharacterStats();
+            
+            let modal = document.getElementById('gameModal');
+            let overlay = document.getElementById('overlay');
+            let gameContent = document.getElementById('gameContent');
+            
+            switch(gameType) {
+                case 'bench':
+                    document.getElementById('gameModalTitle').innerHTML = '🏋️ Жим лежа';
+                    gameContent.innerHTML = getBenchPressGame();
+                    break;
+                case 'rope':
+                    document.getElementById('gameModalTitle').innerHTML = '🪢 Перетягивание каната';
+                    gameContent.innerHTML = getTugOfWarGame();
+                    break;
+                case 'run':
+                    document.getElementById('gameModalTitle').innerHTML = '🏃 Полоса препятствий';
+                    gameContent.innerHTML = getObstacleCourseGame();
+                    break;
+                case 'arm':
+                    document.getElementById('gameModalTitle').innerHTML = '💪 Армрестлинг';
+                    gameContent.innerHTML = getArmWrestlingGame();
+                    break;
+            }
+            
+            modal.classList.add('show');
+            overlay.classList.add('show');
+        }
+        
+        function closeGameModal() {
+            document.getElementById('gameModal').classList.remove('show');
+            document.getElementById('overlay').classList.remove('show');
+            if (gameTimer) clearInterval(gameTimer);
+        }
+        
+        // ИГРА 1: Жим лежа (Кликер)
+        function getBenchPressGame() {
+            gameScore = 0;
+            gameTimeLeft = 10;
+            
+            return `
+                <div style="text-align: center;">
+                    <p style="color: #ccc; margin-bottom: 20px;">
+                        Жми штангу как можно быстрее! Кликай по штанге!
+                    </p>
+                    <div class="game-timer" id="gameTimer">⏱️ 10с</div>
+                    <div class="click-target" id="clickTarget" onclick="clickBench()">
+                        🏋️
+                    </div>
+                    <div class="game-score" id="gameScore">Повторений: 0</div>
+                    <div class="strength-bar">
+                        <div class="strength-fill" id="strengthFill" style="width: 0%"></div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function clickBench() {
+            gameScore++;
+            document.getElementById('gameScore').innerHTML = `Повторений: ${gameScore}`;
+            
+            let target = document.getElementById('clickTarget');
+            target.style.transform = 'scale(0.8)';
+            setTimeout(() => { target.style.transform = 'scale(1)'; }, 100);
+            
+            let progress = (gameScore % 100) / 100 * 100;
+            document.getElementById('strengthFill').style.width = progress + '%';
+            
+            if (!gameTimer) {
+                startGameTimer('bench');
+            }
+        }
+        
+        // ИГРА 2: Перетягивание каната
+        function getTugOfWarGame() {
+            let opponentStrength = characterStats.strength + Math.floor(Math.random() * 10) - 5;
+            if (opponentStrength < 5) opponentStrength = 10;
+            
+            return `
+                <div style="text-align: center;">
+                    <p style="color: #ccc; margin-bottom: 20px;">
+                        Противник: 💪 ${opponentStrength} силы
+                    </p>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin: 30px 0;">
+                        <span style="font-size: 2em;">💪</span>
+                        <div style="width: 200px; height: 20px; background: rgba(255,255,255,0.1); border-radius: 10px;">
+                            <div id="ropeProgress" style="width: 50%; height: 100%; background: linear-gradient(90deg, #FF3D00, #FF6E40); border-radius: 10px;"></div>
+                        </div>
+                        <span style="font-size: 2em;">💪</span>
+                    </div>
+                    <button onclick="pullRope(${opponentStrength})" style="
+                        background: linear-gradient(135deg, #FF3D00, #FF6E40);
+                        color: white;
+                        border: none;
+                        border-radius: 10px;
+                        padding: 15px 30px;
+                        font-size: 1.2em;
+                        cursor: pointer;
+                        margin: 20px 0;
+                    ">ТЯНИ! 💪</button>
+                    <p id="tugResult" style="color: #FF3D00; font-size: 1.2em;"></p>
+                </div>
+            `;
+        }
+        
+        function pullRope(opponentStrength) {
+            let playerPull = Math.floor(Math.random() * characterStats.strength) + 5;
+            let opponentPull = Math.floor(Math.random() * opponentStrength) + 5;
+            
+            let progress = document.getElementById('ropeProgress');
+            let currentProgress = parseInt(progress.style.width) || 50;
+            
+            if (playerPull > opponentPull) {
+                currentProgress += 10;
+            } else {
+                currentProgress -= 10;
+            }
+            
+            currentProgress = Math.max(0, Math.min(100, currentProgress));
+            progress.style.width = currentProgress + '%';
+            
+            if (currentProgress <= 0) {
+                document.getElementById('tugResult').innerHTML = '❌ Вы проиграли!';
+                finishTugOfWar(false, opponentStrength);
+            } else if (currentProgress >= 100) {
+                document.getElementById('tugResult').innerHTML = '🎉 ПОБЕДА!';
+                finishTugOfWar(true, opponentStrength);
+            }
+        }
+        
+        function finishTugOfWar(won, opponentStrength) {
+            let oldStrength = characterStats.strength;
+            let gain;
+            
+            if (won) {
+                gain = Math.floor(Math.random() * 8) + 5;
+                characterStats.strength += gain;
+                showNotification('🎉 ПОБЕДА!', `Вы победили и получили +${gain} силы!`, '💪');
+            } else {
+                gain = Math.floor(Math.random() * 4) + 1;
+                characterStats.strength += gain;
+                showNotification('💪 Хорошая попытка!', `Вы получили +${gain} силы`, '🏋️');
+            }
+            
+            // Проверяем повышение уровня силы
+            checkStrengthLevelUp(oldStrength, characterStats.strength);
+            
+            saveCharacterStats();
+            setTimeout(closeGameModal, 2000);
+        }
+        
+        // ИГРА 3: Полоса препятствий
+        function getObstacleCourseGame() {
+            obstacleCount = 0;
+            return `
+                <div style="text-align: center;">
+                    <p style="color: #ccc; margin-bottom: 20px;">
+                        Нажимай на препятствия, чтобы преодолеть их!
+                    </p>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 20px 0;">
+                        <div onclick="jumpObstacle(this)" style="background: #FF3D00; padding: 20px; border-radius: 10px; cursor: pointer;">🏃</div>
+                        <div onclick="jumpObstacle(this)" style="background: #FF6E40; padding: 20px; border-radius: 10px; cursor: pointer;">🏊</div>
+                        <div onclick="jumpObstacle(this)" style="background: #FF8A65; padding: 20px; border-radius: 10px; cursor: pointer;">🧗</div>
+                    </div>
+                    <p id="obstacleProgress">Препятствий преодолено: 0/10</p>
+                </div>
+            `;
+        }
+        
+        let obstacleCount = 0;
+        function jumpObstacle(element) {
+            obstacleCount++;
+            element.style.opacity = '0.5';
+            element.onclick = null;
+            document.getElementById('obstacleProgress').innerHTML = `Препятствий преодолено: ${obstacleCount}/10`;
+            
+            if (obstacleCount >= 10) {
+                let oldStrength = characterStats.strength;
+                let gain = Math.floor(Math.random() * 9) + 4;
+                characterStats.strength += gain;
+                
+                // Проверяем повышение уровня силы
+                checkStrengthLevelUp(oldStrength, characterStats.strength);
+                
+                showNotification('🎉 ФИНИШ!', `Вы преодолели полосу препятствий! +${gain} силы!`, '🏃');
+                saveCharacterStats();
+                obstacleCount = 0;
+                setTimeout(closeGameModal, 2000);
+            }
+        }
+        
+        // ИГРА 4: Армрестлинг
+        function getArmWrestlingGame() {
+            let championStrength = Math.floor(characterStats.strength * 1.5);
+            return `
+                <div style="text-align: center;">
+                    <p style="color: #ccc; margin-bottom: 20px;">
+                        Чемпион: 💪 ${championStrength} силы
+                    </p>
+                    <div style="margin: 30px 0;">
+                        <span style="font-size: 4em;">💪</span>
+                        <span style="font-size: 2em; color: #FF3D00;">VS</span>
+                        <span style="font-size: 4em;">💪</span>
+                    </div>
+                    <button onclick="armWrestle(${championStrength})" style="
+                        background: linear-gradient(135deg, #FF3D00, #FF6E40);
+                        color: white;
+                        border: none;
+                        border-radius: 50px;
+                        padding: 20px 40px;
+                        font-size: 1.5em;
+                        cursor: pointer;
+                        margin: 20px 0;
+                    ">БОЙ! 🥊</button>
+                </div>
+            `;
+        }
+        
+        function armWrestle(championStrength) {
+            let oldStrength = characterStats.strength;
+            let playerRoll = Math.random() * characterStats.strength;
+            let championRoll = Math.random() * championStrength;
+            
+            if (playerRoll > championRoll) {
+                let gain = Math.floor(Math.random() * 11) + 5;
+                characterStats.strength += gain;
+                let bonus = Math.floor(Math.random() * 1000) + 500;
+                characterStats.money += bonus;
+                
+                // Проверяем повышение уровня силы
+                checkStrengthLevelUp(oldStrength, characterStats.strength);
+                
+                showNotification('🏆 ЧЕМПИОН!', `Вы победили чемпиона! +${gain} силы, +${bonus} ₽!`, '👑');
+            } else {
+                let gain = Math.floor(Math.random() * 5) + 2;
+                characterStats.strength += gain;
+                
+                // Проверяем повышение уровня силы
+                checkStrengthLevelUp(oldStrength, characterStats.strength);
+                
+                showNotification('💪 Достойный бой!', `Вы получили +${gain} силы!`, '🥈');
+            }
+            
+            saveCharacterStats();
+            setTimeout(closeGameModal, 3000);
+        }
+        
+        // Таймер для игр
+        function startGameTimer(gameType) {
+            gameTimer = setInterval(function() {
+                gameTimeLeft--;
+                document.getElementById('gameTimer').innerHTML = `⏱️ ${gameTimeLeft}с`;
+                
+                if (gameTimeLeft <= 0) {
+                    clearInterval(gameTimer);
+                    gameTimer = null;
+                    
+                    if (gameType === 'bench') {
+                        let oldStrength = characterStats.strength;
+                        let gain = Math.floor(gameScore / 5) + 2;
+                        characterStats.strength += gain;
+                        
+                        // Проверяем повышение уровня силы
+                        checkStrengthLevelUp(oldStrength, characterStats.strength);
+                        
+                        showNotification('🎯 Тренировка окончена!', `Вы сделали ${gameScore} повторений! +${gain} силы!`, '🏋️');
+                        saveCharacterStats();
+                        setTimeout(closeGameModal, 2000);
+                    }
+                }
+            }, 1000);
+        }
+        
+        // Уведомления
+        function showNotification(title, message, icon = '🏋️') {
+            let notification = document.getElementById('notification');
+            document.getElementById('notificationIcon').textContent = icon;
+            document.getElementById('notificationTitle').textContent = title;
+            document.getElementById('notificationMessage').textContent = message;
+            
+            notification.classList.add('show');
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', function() {
+            loadActiveCharacter();
+            loadCharacterStats();
+            updateUI();
+            setInterval(updateButtons, 1000);
+        });
+        
+        window.addEventListener('beforeunload', function() {
+            if (activeCharacter) {
+                localStorage.setItem('activeCharacter', JSON.stringify(activeCharacter));
+            }
+            saveCharacterStats();
+        });
+    </script>
+</body>
+</html>
