@@ -1053,6 +1053,91 @@
         firebase.initializeApp(firebaseConfig);
         const firestore = firebase.firestore();
 
+        // ===== ВАША БАЗА ДАННЫХ =====
+        const initialDatabase = {
+            "users": [
+                {
+                    "id": 1,
+                    "username": "admin",
+                    "password": "admin1dfsgadfhwetrW4T3254YURTJ",
+                    "created": "2026-03-15T19:23:37.820Z",
+                    "lastLogin": "2026-03-15T19:26:20.723Z",
+                    "loginCount": 2,
+                    "isAdmin": true,
+                    "isAssistant": false
+                },
+                {
+                    "id": 2,
+                    "username": "KtoYa?",
+                    "password": "Killeropo090!",
+                    "created": "2026-03-15T19:25:26.902Z",
+                    "lastLogin": "2026-03-15T20:23:57.894Z",
+                    "loginCount": 6,
+                    "isAdmin": true,
+                    "isAssistant": false
+                }
+            ],
+            "nextId": 3,
+            "characters": [
+                {
+                    "id": 1,
+                    "userId": 1,
+                    "name": "Герой Админ",
+                    "face": "Улыбающееся",
+                    "skin": "Светлый",
+                    "hair": "Прямые",
+                    "hairColor": "Коричневый",
+                    "clothes": "Доспехи",
+                    "clothesColor": "Золотой",
+                    "accessory": "Нет",
+                    "created": "2026-03-15T19:23:37.820Z"
+                },
+                {
+                    "id": 2,
+                    "userId": 2,
+                    "name": "KtoYa?",
+                    "face": "Обычное",
+                    "skin": "Светлый",
+                    "hair": "Прямые",
+                    "hairColor": "Коричневый",
+                    "clothes": "Футболка",
+                    "clothesColor": "Синий",
+                    "accessory": "Нет",
+                    "created": "2026-03-15T19:25:43.466Z",
+                    "avatar": "💇 😐 👕"
+                },
+                {
+                    "id": 3,
+                    "userId": 3,
+                    "name": "dsafhg",
+                    "face": "Обычное",
+                    "skin": "Светлый",
+                    "hair": "Прямые",
+                    "hairColor": "Коричневый",
+                    "clothes": "Футболка",
+                    "clothesColor": "Синий",
+                    "accessory": "Нет",
+                    "created": "2026-03-15T20:04:09.251Z",
+                    "avatar": "💇 😐 👕"
+                },
+                {
+                    "id": 6,
+                    "userId": 7,
+                    "name": "sfgjh",
+                    "face": "Обычное",
+                    "skin": "Светлый",
+                    "hair": "Прямые",
+                    "hairColor": "Коричневый",
+                    "clothes": "Футболка",
+                    "clothesColor": "Синий",
+                    "accessory": "Нет",
+                    "created": "2026-03-15T20:14:05.703Z",
+                    "avatar": "💇 😐 👕"
+                }
+            ],
+            "nextCharId": 11
+        };
+
         // ===== КЛАСС ДЛЯ РАБОТЫ С БАЗОЙ ДАННЫХ =====
         class CloudDatabase {
             constructor() {
@@ -1063,33 +1148,8 @@
             // Инициализация локальной базы
             init() {
                 if (!localStorage.getItem(this.localDbName)) {
-                    const initialData = {
-                        users: [
-                            {
-                                id: 1,
-                                username: 'admin',
-                                password: 'admin123',
-                                created: new Date().toISOString(),
-                                lastLogin: new Date().toISOString(),
-                                loginCount: 1,
-                                isAdmin: true,
-                                isAssistant: false
-                            }
-                        ],
-                        nextId: 2,
-                        characters: [
-                            {
-                                id: 1,
-                                userId: 1,
-                                name: "Герой Админ",
-                                class: "Воин",
-                                avatar: "👨",
-                                created: new Date().toISOString(),
-                            }
-                        ],
-                        nextCharId: 2
-                    };
-                    localStorage.setItem(this.localDbName, JSON.stringify(initialData));
+                    // Используем вашу базу данных
+                    localStorage.setItem(this.localDbName, JSON.stringify(initialDatabase));
                 }
             }
 
@@ -1118,9 +1178,9 @@
             }
 
             // Сохранение данных в облако
-            async saveToCloud() {
+            async saveToCloud(dataToSave = null) {
                 try {
-                    const localData = this.getDatabase();
+                    const localData = dataToSave || this.getDatabase();
                     const docRef = firestore.collection('game_data').doc('main_database');
                     await docRef.set({ 
                         data: localData,
@@ -1136,25 +1196,37 @@
 
             // Получить локальную базу
             getDatabase() {
-                return JSON.parse(localStorage.getItem(this.localDbName) || '{"users":[], "characters":[], "nextId": 1, "nextCharId": 1}');
+                const data = localStorage.getItem(this.localDbName);
+                if (!data) {
+                    return initialDatabase;
+                }
+                try {
+                    return JSON.parse(data);
+                } catch {
+                    return initialDatabase;
+                }
             }
 
             // Сохранить локальную базу и синхронизировать с облаком
             async saveDatabase(db) {
                 localStorage.setItem(this.localDbName, JSON.stringify(db));
-                await this.saveToCloud(); // Синхронизируем с облаком
+                await this.saveToCloud(db); // Синхронизируем с облаком
             }
 
             // ===== ПОЛЬЗОВАТЕЛИ =====
 
             async registerUser(username, password) {
-                const db = this.getDatabase();
+                // Сначала загружаем свежие данные из облака
+                const cloudData = await this.loadFromCloud();
+                const db = cloudData || this.getDatabase();
                 
-                const existingUser = db.users.find(user => user.username === username);
+                // Проверяем существование пользователя
+                const existingUser = db.users.find(user => user.username.toLowerCase() === username.toLowerCase());
                 if (existingUser) {
                     return { success: false, message: 'Пользователь уже существует' };
                 }
                 
+                // Создаем нового пользователя
                 const newUser = {
                     id: db.nextId++,
                     username: username,
@@ -1184,7 +1256,10 @@
             }
 
             async loginUser(username, password) {
-                const db = this.getDatabase();
+                // Сначала загружаем свежие данные из облака
+                const cloudData = await this.loadFromCloud();
+                const db = cloudData || this.getDatabase();
+                
                 const user = db.users.find(u => u.username === username && u.password === password);
                 
                 if (user) {
@@ -1273,8 +1348,14 @@
                     id: newCharId,
                     userId: userId,
                     name: characterData.name,
-                    class: characterData.class,
-                    avatar: characterData.avatar || '👤',
+                    face: characterData.face || "Обычное",
+                    skin: characterData.skin || "Светлый",
+                    hair: characterData.hair || "Прямые",
+                    hairColor: characterData.hairColor || "Коричневый",
+                    clothes: characterData.clothes || "Футболка",
+                    clothesColor: characterData.clothesColor || "Синий",
+                    accessory: characterData.accessory || "Нет",
+                    avatar: characterData.avatar || "👤",
                     created: new Date().toISOString(),
                 };
                 
@@ -1363,7 +1444,7 @@
 
             async resetDatabase() {
                 localStorage.removeItem(this.localDbName);
-                this.init();
+                localStorage.setItem(this.localDbName, JSON.stringify(initialDatabase));
                 
                 // Удаляем в облаке
                 try {
@@ -1729,7 +1810,7 @@
                         <div class="character-preview">${character.avatar || '👤'}</div>
                         <div class="character-name">${character.name}</div>
                         <div class="character-details">
-                            ${character.class}<br>
+                            ${character.face || 'Обычное'}<br>
                             <small>Создан: ${formattedDate}</small>
                         </div>
                         <div class="character-actions">
@@ -1761,7 +1842,7 @@
                 
                 document.getElementById('selectedCharVisual').textContent = result.character.avatar || '👤';
                 document.getElementById('selectedCharName').textContent = result.character.name;
-                document.getElementById('selectedCharClass').textContent = result.character.class || 'Не указан';
+                document.getElementById('selectedCharClass').textContent = result.character.face || 'Обычное';
                 
                 const createdDate = new Date(result.character.created);
                 document.getElementById('selectedCharCreated').textContent = createdDate.toLocaleString();
@@ -1946,7 +2027,7 @@
                         updateConsoleStats();
                         
                         if (currentUser) {
-                            const userCheck = cloudDb.getUserById(currentUser.id);
+                            const userCheck = await cloudDb.getUserById(currentUser.id);
                             if (userCheck.success) {
                                 showUserPanel(userCheck.user);
                             }
