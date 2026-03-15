@@ -862,7 +862,7 @@
             </h3>
             
             <div id="navGrid" class="nav-grid">
-                <!-- Навигация будет динамически генерироваться в зависимости от прав пользователя -->
+                <!-- Навигация будет динамически генерироваться -->
             </div>
         </div>
         
@@ -943,12 +943,8 @@
                                     <div class="char-stat-value" id="selectedCharName">-</div>
                                 </div>
                                 <div class="char-stat-row">
-                                    <div class="char-stat-name">Внешность:</div>
-                                    <div class="char-stat-value" id="selectedCharAppearance">-</div>
-                                </div>
-                                <div class="char-stat-row">
-                                    <div class="char-stat-name">Одежда:</div>
-                                    <div class="char-stat-value" id="selectedCharClothes">-</div>
+                                    <div class="char-stat-name">Класс:</div>
+                                    <div class="char-stat-value" id="selectedCharClass">-</div>
                                 </div>
                                 <div class="char-stat-row">
                                     <div class="char-stat-name">Создан:</div>
@@ -991,8 +987,8 @@
                             <input type="file" id="databaseUpload" accept=".json" onchange="uploadDatabase(event)">
                         </div>
                         
-                        <button class="console-btn admin-panel" onclick="goToAdminPanel()">
-                            <i class="fas fa-cogs"></i> Перейти в админ-панель
+                        <button class="console-btn reset" onclick="resetDatabase()">
+                            <i class="fas fa-undo"></i> Сбросить базу данных
                         </button>
                         
                         <button class="console-btn delete-all" onclick="deleteAllUsers()">
@@ -1044,8 +1040,10 @@
             constructor() {
                 this.dbName = 'character_creator_db';
                 this.init();
+                this.syncWithServer();
             }
             
+            // Инициализация базы данных
             init() {
                 if (!localStorage.getItem(this.dbName)) {
                     const initialData = {
@@ -1053,7 +1051,7 @@
                             {
                                 id: 1,
                                 username: 'admin',
-                                password: 'admin1dfsgadfhwetrW4T3254YURTJ',
+                                password: 'admin123',
                                 created: new Date().toISOString(),
                                 lastLogin: new Date().toISOString(),
                                 loginCount: 1,
@@ -1067,13 +1065,8 @@
                                 id: 1,
                                 userId: 1,
                                 name: "Герой Админ",
-                                face: "Улыбающееся",
-                                skin: "Светлый",
-                                hair: "Прямые",
-                                hairColor: "Коричневый",
-                                clothes: "Доспехи",
-                                clothesColor: "Золотой",
-                                accessory: "Нет",
+                                class: "Воин",
+                                avatar: "👨",
                                 created: new Date().toISOString(),
                             }
                         ],
@@ -1083,9 +1076,93 @@
                 }
             }
             
+            // Синхронизация с сервером
+            syncWithServer() {
+                // Генерируем уникальный ID для этой сессии/компьютера
+                let sessionId = localStorage.getItem('session_id');
+                if (!sessionId) {
+                    sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                    localStorage.setItem('session_id', sessionId);
+                }
+                
+                // Проверяем, есть ли общая база в localStorage
+                let sharedDb = this.getSharedDatabase();
+                
+                if (sharedDb) {
+                    // Объединяем локальную базу с общей
+                    this.mergeWithSharedDatabase(sharedDb);
+                } else {
+                    // Сохраняем локальную базу как общую
+                    this.saveSharedDatabase();
+                }
+            }
+            
+            // Получить общую базу данных (из специального ключа)
+            getSharedDatabase() {
+                try {
+                    const sharedDb = localStorage.getItem('shared_character_db');
+                    return sharedDb ? JSON.parse(sharedDb) : null;
+                } catch (e) {
+                    console.error('Ошибка чтения общей базы:', e);
+                    return null;
+                }
+            }
+            
+            // Сохранить общую базу данных
+            saveSharedDatabase() {
+                try {
+                    const localDb = this.getDatabase();
+                    localStorage.setItem('shared_character_db', JSON.stringify(localDb));
+                    return true;
+                } catch (e) {
+                    console.error('Ошибка сохранения общей базы:', e);
+                    return false;
+                }
+            }
+            
+            // Объединить локальную базу с общей
+            mergeWithSharedDatabase(sharedDb) {
+                const localDb = this.getDatabase();
+                
+                // Объединяем пользователей
+                const mergedUsers = [...localDb.users];
+                const mergedCharacters = [...localDb.characters];
+                
+                // Добавляем пользователей из общей базы, которых нет в локальной
+                sharedDb.users.forEach(sharedUser => {
+                    if (!mergedUsers.some(u => u.id === sharedUser.id)) {
+                        mergedUsers.push(sharedUser);
+                    }
+                });
+                
+                // Добавляем персонажей из общей базы, которых нет в локальной
+                sharedDb.characters.forEach(sharedChar => {
+                    if (!mergedCharacters.some(c => c.id === sharedChar.id)) {
+                        mergedCharacters.push(sharedChar);
+                    }
+                });
+                
+                // Обновляем nextId и nextCharId
+                const maxUserId = Math.max(...mergedUsers.map(u => u.id), sharedDb.nextId, localDb.nextId);
+                const maxCharId = Math.max(...mergedCharacters.map(c => c.id), sharedDb.nextCharId, localDb.nextCharId);
+                
+                const mergedDb = {
+                    users: mergedUsers,
+                    nextId: maxUserId + 1,
+                    characters: mergedCharacters,
+                    nextCharId: maxCharId + 1
+                };
+                
+                // Сохраняем объединенную базу локально и как общую
+                localStorage.setItem(this.dbName, JSON.stringify(mergedDb));
+                localStorage.setItem('shared_character_db', JSON.stringify(mergedDb));
+            }
+            
+            // ===== ОСНОВНЫЕ ФУНКЦИИ =====
+            
             // Регистрация пользователя
             registerUser(username, password) {
-                const db = JSON.parse(localStorage.getItem(this.dbName));
+                const db = this.getDatabase();
                 
                 const existingUser = db.users.find(user => user.username === username);
                 if (existingUser) {
@@ -1104,7 +1181,7 @@
                 };
                 
                 db.users.push(newUser);
-                localStorage.setItem(this.dbName, JSON.stringify(db));
+                this.saveDatabase(db);
                 
                 return { 
                     success: true, 
@@ -1122,13 +1199,13 @@
             
             // Авторизация пользователя
             loginUser(username, password) {
-                const db = JSON.parse(localStorage.getItem(this.dbName));
+                const db = this.getDatabase();
                 const user = db.users.find(u => u.username === username && u.password === password);
                 
                 if (user) {
                     user.lastLogin = new Date().toISOString();
                     user.loginCount = (user.loginCount || 0) + 1;
-                    localStorage.setItem(this.dbName, JSON.stringify(db));
+                    this.saveDatabase(db);
                     
                     return { 
                         success: true, 
@@ -1151,7 +1228,7 @@
             
             // Получить пользователя по ID
             getUserById(userId) {
-                const db = JSON.parse(localStorage.getItem(this.dbName));
+                const db = this.getDatabase();
                 const user = db.users.find(u => u.id === userId);
                 
                 if (user) {
@@ -1174,14 +1251,30 @@
                 }
             }
             
+            // Получить базу данных
+            getDatabase() {
+                return JSON.parse(localStorage.getItem(this.dbName) || '{"users":[], "characters":[], "nextId": 1, "nextCharId": 1}');
+            }
+            
+            // Сохранить базу данных
+            saveDatabase(db) {
+                localStorage.setItem(this.dbName, JSON.stringify(db));
+                this.saveSharedDatabase(); // Синхронизируем с общей базой
+            }
+            
             // ===== СИСТЕМА ПЕРСОНАЖЕЙ =====
             
             // Получить всех персонажей пользователя
             getUserCharacters(userId) {
-                const db = JSON.parse(localStorage.getItem(this.dbName) || '{"characters":[]}');
+                const db = this.getDatabase();
                 const characters = db.characters?.filter(char => char.userId === userId) || [];
-                
                 return characters.sort((a, b) => new Date(b.created) - new Date(a.created));
+            }
+            
+            // Получить всех персонажей всех пользователей (для консоли)
+            getAllCharacters() {
+                const db = this.getDatabase();
+                return db.characters || [];
             }
             
             // Получить количество персонажей пользователя
@@ -1192,7 +1285,7 @@
             
             // Получить персонажа по ID
             getCharacterById(charId) {
-                const db = JSON.parse(localStorage.getItem(this.dbName) || '{"characters":[]}');
+                const db = this.getDatabase();
                 const character = db.characters?.find(char => char.id === charId);
                 
                 if (character) {
@@ -1204,29 +1297,22 @@
             
             // Создать нового персонажа
             createCharacter(userId, characterData) {
-                const db = JSON.parse(localStorage.getItem(this.dbName));
+                const db = this.getDatabase();
                 
-                // Генерируем уникальный ID для персонажа
                 const newCharId = db.nextCharId++;
                 
                 const newCharacter = {
                     id: newCharId,
                     userId: userId,
                     name: characterData.name,
-                    face: characterData.face,
-                    skin: characterData.skin,
-                    hair: characterData.hair,
-                    hairColor: characterData.hairColor,
-                    clothes: characterData.clothes,
-                    clothesColor: characterData.clothesColor,
-                    accessory: characterData.accessory,
-                    config: characterData.config || {},
+                    class: characterData.class,
+                    avatar: characterData.avatar || '👤',
                     created: new Date().toISOString(),
                 };
                 
                 if (!db.characters) db.characters = [];
                 db.characters.push(newCharacter);
-                localStorage.setItem(this.dbName, JSON.stringify(db));
+                this.saveDatabase(db);
                 
                 return { 
                     success: true, 
@@ -1237,7 +1323,7 @@
             
             // Обновить персонажа
             updateCharacter(charId, characterData) {
-                const db = JSON.parse(localStorage.getItem(this.dbName));
+                const db = this.getDatabase();
                 const charIndex = db.characters?.findIndex(char => char.id === charId);
                 
                 if (charIndex === -1 || charIndex === undefined) {
@@ -1250,7 +1336,7 @@
                     updated: new Date().toISOString()
                 };
                 
-                localStorage.setItem(this.dbName, JSON.stringify(db));
+                this.saveDatabase(db);
                 
                 return { 
                     success: true, 
@@ -1261,7 +1347,7 @@
             
             // Удалить персонажа
             deleteCharacter(charId) {
-                const db = JSON.parse(localStorage.getItem(this.dbName));
+                const db = this.getDatabase();
                 const charIndex = db.characters?.findIndex(char => char.id === charId);
                 
                 if (charIndex === -1 || charIndex === undefined) {
@@ -1270,7 +1356,7 @@
                 
                 const deletedChar = db.characters[charIndex];
                 db.characters.splice(charIndex, 1);
-                localStorage.setItem(this.dbName, JSON.stringify(db));
+                this.saveDatabase(db);
                 
                 return { 
                     success: true, 
@@ -1302,11 +1388,6 @@
             
             // ===== АДМИНИСТРАТИВНЫЕ ФУНКЦИИ =====
             
-            // Получить всю базу данных
-            getDatabase() {
-                return JSON.parse(localStorage.getItem(this.dbName) || '{"users":[], "characters":[], "nextId": 1, "nextCharId": 1}');
-            }
-            
             // Экспорт базы данных в JSON
             exportDatabase() {
                 const db = this.getDatabase();
@@ -1318,12 +1399,11 @@
                 try {
                     const newDb = JSON.parse(jsonData);
                     
-                    // Проверяем структуру данных
                     if (!newDb.users || !newDb.characters || newDb.nextId === undefined || newDb.nextCharId === undefined) {
                         return { success: false, message: 'Неверный формат базы данных' };
                     }
                     
-                    localStorage.setItem(this.dbName, JSON.stringify(newDb));
+                    this.saveDatabase(newDb);
                     
                     // Сохраняем время последнего бэкапа
                     localStorage.setItem('last_backup_time', new Date().toISOString());
@@ -1347,9 +1427,9 @@
             // Сброс базы данных к начальному состоянию
             resetDatabase() {
                 localStorage.removeItem(this.dbName);
+                localStorage.removeItem('shared_character_db');
                 this.init();
                 
-                // Удаляем все связанные данные
                 const keysToRemove = [];
                 for (let i = 0; i < localStorage.length; i++) {
                     const key = localStorage.key(i);
@@ -1373,18 +1453,15 @@
             deleteAllUsers() {
                 const db = this.getDatabase();
                 
-                // Сохраняем администратора и ассистентов
                 const adminUsers = db.users.filter(u => u.username === 'admin' || u.isAdmin || u.isAssistant);
                 
-                // Сбрасываем базу данных
                 db.users = adminUsers;
-                db.nextId = Math.max(...adminUsers.map(u => u.id)) + 1;
+                db.nextId = Math.max(...adminUsers.map(u => u.id), 2) + 1;
                 db.characters = db.characters.filter(char => adminUsers.some(u => u.id === char.userId));
                 db.nextCharId = db.characters.length > 0 ? Math.max(...db.characters.map(c => c.id)) + 1 : 1;
                 
-                localStorage.setItem(this.dbName, JSON.stringify(db));
+                this.saveDatabase(db);
                 
-                // Удаляем связанные данные
                 const keysToRemove = [];
                 for (let i = 0; i < localStorage.length; i++) {
                     const key = localStorage.key(i);
@@ -1397,7 +1474,6 @@
                 }
                 
                 keysToRemove.forEach(key => {
-                    // Не удаляем выбор администратора и ассистентов
                     const userId = key.replace('selected_char_', '');
                     if (userId && !adminUsers.some(u => u.id === parseInt(userId))) {
                         localStorage.removeItem(key);
@@ -1427,7 +1503,7 @@
                 };
             }
             
-            // Создать резервную копию с временной меткой
+            // Создать резервную копию
             createBackup() {
                 const db = this.getDatabase();
                 const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
@@ -1435,7 +1511,6 @@
                 
                 localStorage.setItem(backupKey, JSON.stringify(db));
                 
-                // Ограничиваем количество бэкапов (храним последние 5)
                 const backups = [];
                 for (let i = 0; i < localStorage.length; i++) {
                     const key = localStorage.key(i);
@@ -1456,33 +1531,6 @@
                     message: 'Резервная копия создана!',
                     backupKey: backupKey
                 };
-            }
-            
-            // Восстановить из резервной копии
-            restoreBackup(backupKey) {
-                const backup = localStorage.getItem(backupKey);
-                if (!backup) {
-                    return { success: false, message: 'Резервная копия не найдена' };
-                }
-                
-                return this.importDatabase(backup);
-            }
-            
-            // Получить список резервных копий
-            getBackups() {
-                const backups = [];
-                for (let i = 0; i < localStorage.length; i++) {
-                    const key = localStorage.key(i);
-                    if (key.startsWith('backup_')) {
-                        const timestamp = key.replace('backup_', '').replace(/-/g, ':').replace('T', ' ');
-                        backups.push({
-                            key: key,
-                            timestamp: timestamp.substring(0, timestamp.length - 1)
-                        });
-                    }
-                }
-                
-                return backups.sort((a, b) => b.timestamp.localeCompare(a.timestamp));
             }
         }
         
@@ -1545,36 +1593,17 @@
                     desc: 'Приключения с вашим персонажем',
                     isActive: false,
                     isAdminOnly: false
-                },
-                {
-                    href: 'admin-panel.html',
-                    icon: '👑',
-                    title: 'Админ панель',
-                    desc: 'Управление системой (админам и ассистентам)',
-                    isActive: false,
-                    isAdminOnly: true
-                },
+                }
             ];
             
             navGrid.innerHTML = '';
             
             navItems.forEach(item => {
-                // Показываем админ-панель для администраторов и ассистентов
-                if (item.isAdminOnly && !isAdminOrAssistant) {
-                    return;
-                }
-                
                 const navCard = document.createElement('a');
                 navCard.href = item.href;
-                navCard.className = `nav-card ${item.isActive ? 'active' : ''} ${item.isAdminOnly ? 'admin-only' : ''}`;
-                
-                let badge = '';
-                if (item.isAdminOnly) {
-                    badge = '<div class="admin-badge">ADMIN/ASSISTANT</div>';
-                }
+                navCard.className = `nav-card ${item.isActive ? 'active' : ''}`;
                 
                 navCard.innerHTML = `
-                    ${badge}
                     <div class="nav-icon">${item.icon}</div>
                     <div class="nav-card-title">${item.title}</div>
                     <div class="nav-card-desc">${item.desc}</div>
@@ -1587,19 +1616,15 @@
         function showUserPanel(user) {
             currentUser = user;
             
-            // Обновляем информацию пользователя
             document.getElementById('currentUser').textContent = user.username;
             document.getElementById('userId').textContent = user.id;
             
-            // Получаем и отображаем количество персонажей
             const charCount = db.getUserCharacterCount(user.id);
             document.getElementById('charCount').textContent = charCount;
             
-            // Форматируем дату создания
             const createdDate = new Date(user.created);
             document.getElementById('createdDate').textContent = createdDate.toLocaleDateString();
             
-            // Показываем бейдж администратора или ассистента
             const adminBadge = document.getElementById('adminBadge');
             const assistantBadge = document.getElementById('assistantBadge');
             const adminConsoleBtn = document.getElementById('adminConsoleBtn');
@@ -1618,9 +1643,7 @@
                 consoleTitle.textContent = 'Консоль администратора';
                 consoleEl.classList.remove('assistant-console');
                 
-                // Обновляем навигационную панель для администратора
                 updateNavigationPanel(true);
-                // Показываем консоль администратора
                 showAdminConsole();
             } else if (user.isAssistant) {
                 adminBadge.style.display = 'none';
@@ -1633,34 +1656,24 @@
                 consoleTitle.textContent = 'Консоль ассистента';
                 consoleEl.classList.add('assistant-console');
                 
-                // Обновляем навигационную панель для ассистента
                 updateNavigationPanel(true);
-                // Показываем консоль ассистента
                 showAdminConsole();
             } else {
                 adminBadge.style.display = 'none';
                 assistantBadge.style.display = 'none';
                 adminConsoleBtn.style.display = 'none';
-                // Обновляем навигационную панель для обычного пользователя
                 updateNavigationPanel(false);
-                // Скрываем консоль для обычных пользователей
                 consoleEl.style.display = 'none';
             }
             
-            // Переключаем видимость панелей
             document.getElementById('userPanel').classList.add('show');
             document.getElementById('authForm').style.display = 'none';
             
-            // Загружаем персонажей пользователя
             loadUserCharacters();
-            
-            // Загружаем выбранного персонажа
             loadSelectedCharacter();
             
-            // Сохраняем информацию о текущем пользователе
             localStorage.setItem('currentUser', JSON.stringify(user));
             
-            // Обновляем статистику в консоли
             updateConsoleStats();
         }
         
@@ -1672,7 +1685,6 @@
             selectedCharacter = null;
             isConsoleVisible = false;
             
-            // Обновляем навигационную панель для неавторизованных пользователей
             updateNavigationPanel(false);
         }
         
@@ -1718,11 +1730,9 @@
             
             if (result.success) {
                 showMessage(`✅ ${result.message}`, 'success');
-                // Очищаем поля после успешной регистрации
                 document.getElementById('username').value = '';
                 document.getElementById('password').value = '';
                 
-                // Автоматически входим после регистрации
                 setTimeout(() => {
                     showUserPanel(result.user);
                 }, 1000);
@@ -1733,7 +1743,6 @@
         
         function logout() {
             hideUserPanel();
-            // Очищаем поля формы
             document.getElementById('username').value = '';
             document.getElementById('password').value = '';
             showMessage('👋 Вы вышли из системы', 'success');
@@ -1741,7 +1750,6 @@
         
         // ===== ФУНКЦИИ РАБОТЫ С ПЕРСОНАЖАМИ =====
         
-        // Загрузка персонажей пользователя
         function loadUserCharacters() {
             if (!currentUser) return;
             
@@ -1751,7 +1759,6 @@
             charactersList.innerHTML = '';
             
             if (characters.length === 0) {
-                // Показываем карточку для создания первого персонажа
                 charactersList.innerHTML = `
                     <div class="character-card empty" onclick="createNewCharacter()">
                         <div class="empty-icon">➕</div>
@@ -1762,7 +1769,6 @@
                     </div>
                 `;
             } else {
-                // Отображаем всех персонажей
                 characters.forEach(character => {
                     const characterCard = document.createElement('div');
                     characterCard.className = 'character-card';
@@ -1775,17 +1781,11 @@
                     const createdDate = new Date(character.created);
                     const formattedDate = createdDate.toLocaleDateString();
                     
-                    // Формируем описание персонажа
-                    const appearance = `${character.hair} ${character.hairColor ? '(' + character.hairColor + ')' : ''}`;
-                    const outfit = `${character.clothes} ${character.clothesColor ? '(' + character.clothesColor + ')' : ''}`;
-                    
                     characterCard.innerHTML = `
-                        <div class="character-preview">
-                        </div>
+                        <div class="character-preview">${character.avatar || '👤'}</div>
                         <div class="character-name">${character.name}</div>
                         <div class="character-details">
-                            ${appearance}<br>
-                            ${outfit}<br>
+                            ${character.class}<br>
                             <small>Создан: ${formattedDate}</small>
                         </div>
                         <div class="character-actions">
@@ -1802,11 +1802,9 @@
                 });
             }
             
-            // Обновляем счетчик персонажей
             document.getElementById('charCount').textContent = characters.length;
         }
         
-        // Загрузка выбранного персонажа
         function loadSelectedCharacter() {
             if (!currentUser) return;
             
@@ -1817,17 +1815,13 @@
                 selectedCharacter = result.character;
                 selectedInfo.classList.add('show');
                 
-                // Обновляем информацию о выбранном персонаже
+                document.getElementById('selectedCharVisual').textContent = result.character.avatar || '👤';
                 document.getElementById('selectedCharName').textContent = result.character.name;
-                document.getElementById('selectedCharAppearance').textContent = 
-                    `${result.character.hair} (${result.character.hairColor}), ${result.character.skin} кожа, ${result.character.face}`;
-                document.getElementById('selectedCharClothes').textContent = 
-                    `${result.character.clothes} (${result.character.clothesColor}) ${result.character.accessory ? '+ ' + result.character.accessory : ''}`;
+                document.getElementById('selectedCharClass').textContent = result.character.class || 'Не указан';
                 
                 const createdDate = new Date(result.character.created);
                 document.getElementById('selectedCharCreated').textContent = createdDate.toLocaleString();
                 
-                // Обновляем выделение в списке
                 document.querySelectorAll('.character-card').forEach(card => {
                     card.classList.remove('selected');
                     if (parseInt(card.dataset.charId) === result.character.id) {
@@ -1840,7 +1834,6 @@
             }
         }
         
-        // Выбор персонажа
         function selectCharacter(charId) {
             if (!currentUser) return;
             
@@ -1851,7 +1844,6 @@
             }
         }
         
-        // Отмена выбора персонажа
         function deselectCharacter() {
             if (!currentUser) return;
             
@@ -1861,14 +1853,12 @@
                 document.getElementById('selectedCharacterInfo').classList.remove('show');
                 showMessage('✅ Выбор персонажа отменен', 'success');
                 
-                // Снимаем выделение со всех карточек
                 document.querySelectorAll('.character-card').forEach(card => {
                     card.classList.remove('selected');
                 });
             }
         }
         
-        // Удаление персонажа
         function deleteCharacter(charId) {
             if (!confirm('Вы уверены, что хотите удалить этого персонажа?')) {
                 return;
@@ -1876,60 +1866,35 @@
             
             const result = db.deleteCharacter(charId);
             if (result.success) {
-                // Если удалили выбранного персонажа, снимаем выбор
                 if (selectedCharacter && selectedCharacter.id === charId) {
                     deselectCharacter();
                 }
                 
-                // Перезагружаем список персонажей
                 loadUserCharacters();
                 showMessage('✅ Персонаж удален', 'success');
-                
-                // Обновляем статистику в консоли
                 updateConsoleStats();
             } else {
                 showMessage(`❌ ${result.message}`, 'error');
             }
         }
         
-        // Редактирование персонажа
-        function editCharacter(charId) {
-            // Сохраняем ID персонажа для редактирования
-            localStorage.setItem('editCharacterId', charId);
-            // Переходим на страницу создания/редактирования
-            window.location.href = 'create-character.html?edit=' + charId;
-        }
-        
-        // Редактирование выбранного персонажа
-        function editSelectedCharacter() {
-            if (selectedCharacter) {
-                editCharacter(selectedCharacter.id);
-            }
-        }
-        
-        // Создание нового персонажа
         function createNewCharacter() {
-            localStorage.removeItem('editCharacterId');
+            // Перенаправляем на страницу создания персонажа
             window.location.href = 'create-character.html';
         }
         
-        // Играть с выбранным персонажем
         function playWithSelectedCharacter() {
             if (!selectedCharacter) {
                 showMessage('❌ Сначала выберите персонажа!', 'error');
                 return;
             }
             
-            // Сохраняем выбранного персонажа в сессии
             localStorage.setItem('activeCharacter', JSON.stringify(selectedCharacter));
-            
-            // Переходим на страницу игры
             window.location.href = 'game-world.html';
         }
         
         // ===== КОНСОЛЬ АДМИНИСТРАТОРА/АССИСТЕНТА =====
         
-        // Показать/скрыть консоль
         function showAdminConsole() {
             if (!currentUser || (!currentUser.isAdmin && !currentUser.isAssistant)) return;
             
@@ -1963,7 +1928,6 @@
             }
         }
         
-        // Обновление статистики в консоли
         function updateConsoleStats() {
             if (!currentUser || (!currentUser.isAdmin && !currentUser.isAssistant)) return;
             
@@ -1976,7 +1940,6 @@
                 stats.lastBackup === 'Никогда' ? 'Никогда' : new Date(stats.lastBackup).toLocaleString();
         }
         
-        // Скачать базу данных
         function downloadDatabase() {
             if (!currentUser || (!currentUser.isAdmin && !currentUser.isAssistant)) {
                 showConsoleMessage('Доступ запрещен! Только для администраторов и ассистентов.', 'error');
@@ -1988,7 +1951,6 @@
                 const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
                 const filename = `character_database_backup_${timestamp}.json`;
                 
-                // Создаем временную ссылку для скачивания
                 const blob = new Blob([data], { type: 'application/json' });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
@@ -2000,7 +1962,6 @@
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
                 
-                // Создаем резервную копию
                 db.createBackup();
                 
                 showConsoleMessage(`База данных скачана как ${filename}`, 'success');
@@ -2010,7 +1971,6 @@
             }
         }
         
-        // Загрузить базу данных
         function uploadDatabase(event) {
             if (!currentUser || (!currentUser.isAdmin && !currentUser.isAssistant)) {
                 showConsoleMessage('Доступ запрещен! Только для администраторов и ассистентов.', 'error');
@@ -2040,10 +2000,8 @@
                         showConsoleMessage(`✅ ${result.message}`, 'success');
                         showConsoleMessage(`Загружено: ${result.stats.users} пользователей, ${result.stats.characters} персонажей`, 'info');
                         
-                        // Обновляем интерфейс
                         updateConsoleStats();
                         
-                        // Перезагружаем данные текущего пользователя
                         if (currentUser) {
                             const userCheck = db.getUserById(currentUser.id);
                             if (userCheck.success) {
@@ -2057,7 +2015,6 @@
                     showConsoleMessage(`Ошибка при обработке файла: ${error.message}`, 'error');
                 }
                 
-                // Очищаем поле выбора файла
                 event.target.value = '';
             };
             
@@ -2069,22 +2026,26 @@
             reader.readAsText(file);
         }
         
-        // Перейти в админ панель
-        function goToAdminPanel() {
+        function resetDatabase() {
             if (!currentUser || (!currentUser.isAdmin && !currentUser.isAssistant)) {
                 showConsoleMessage('Доступ запрещен! Только для администраторов и ассистентов.', 'error');
                 return;
             }
             
-            showConsoleMessage('Переход в админ-панель...', 'info');
+            if (!confirm('ВНИМАНИЕ: Это полностью сбросит базу данных к начальному состоянию. Все пользователи и персонажи будут удалены. Продолжить?')) {
+                return;
+            }
             
-            // Открываем админ-панель в новой вкладке
-            setTimeout(() => {
-                window.open('admin-panel.html', '_blank');
-            }, 500);
+            const result = db.resetDatabase();
+            
+            if (result.success) {
+                showConsoleMessage(`✅ ${result.message}`, 'success');
+                updateConsoleStats();
+                
+                logout();
+            }
         }
         
-        // Удалить всех пользователей
         function deleteAllUsers() {
             if (!currentUser || (!currentUser.isAdmin && !currentUser.isAssistant)) {
                 showConsoleMessage('Доступ запрещен! Только для администраторов и ассистентов.', 'error');
@@ -2101,24 +2062,20 @@
                 showConsoleMessage(`✅ ${result.message}`, 'success');
                 showConsoleMessage(`Осталось: ${result.stats.users} пользователей, ${result.stats.characters} персонажей`, 'info');
                 
-                // Обновляем интерфейс
                 updateConsoleStats();
                 
-                // Если текущий пользователь не админ и не ассистент, выходим
                 if (currentUser && !currentUser.isAdmin && !currentUser.isAssistant) {
                     showConsoleMessage('Ваш аккаунт был удален. Выход из системы...', 'warning');
                     setTimeout(() => {
                         logout();
                     }, 2000);
                 } else {
-                    // Перезагружаем данные
                     loadUserCharacters();
                     loadSelectedCharacter();
                 }
             }
         }
         
-        // Восстановление сессии при загрузке страницы
         function restoreSession() {
             const savedUser = localStorage.getItem('currentUser');
             
@@ -2140,11 +2097,9 @@
         
         // Инициализация при загрузке страницы
         window.addEventListener('load', function() {
-            // Инициализируем навигационную панель для неавторизованных пользователей
             updateNavigationPanel(false);
             restoreSession();
             
-            // Обработка нажатия Enter в полях формы
             const usernameInput = document.getElementById('username');
             const passwordInput = document.getElementById('password');
             
@@ -2160,194 +2115,5 @@
             passwordInput.addEventListener('keypress', handleEnterKey);
         });
     </script>
-    <!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Создание персонажа</title>
-    <style>
-        /* Ваши стили */
-    </style>
-</head>
-<body>
-    <!-- Ваша разметка -->
-
-    <script>
-        // Функция для сохранения персонажа в общую базу
-        async function saveCharacterToDatabase(character) {
-            try {
-                const response = await fetch('db.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        action: 'save',
-                        character: character
-                    })
-                });
-                
-                const result = await response.json();
-                return result.success;
-            } catch (error) {
-                console.error('Ошибка сохранения в базу:', error);
-                return false;
-            }
-        }
-        
-        // Функция для загрузки всех персонажей
-        async function loadAllCharacters() {
-            try {
-                const response = await fetch('db.php');
-                const data = await response.json();
-                return data.characters || [];
-            } catch (error) {
-                console.error('Ошибка загрузки персонажей:', error);
-                return [];
-            }
-        }
-        
-        // Функция для получения персонажа по ID
-        async function getCharacterById(characterId) {
-            try {
-                const response = await fetch('db.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        action: 'get',
-                        characterId: characterId
-                    })
-                });
-                
-                return await response.json();
-            } catch (error) {
-                console.error('Ошибка загрузки персонажа:', error);
-                return null;
-            }
-        }
-        
-        // Функция для сохранения статистики персонажа
-        async function saveCharacterStats(characterId, stats) {
-            try {
-                const response = await fetch('db.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        action: 'updateStats',
-                        characterId: characterId,
-                        stats: stats
-                    })
-                });
-                
-                const result = await response.json();
-                return result.success;
-            } catch (error) {
-                console.error('Ошибка сохранения статистики:', error);
-                return false;
-            }
-        }
-        
-        // Функция создания персонажа (исправленная)
-        async function createCharacter() {
-            const nameInput = document.getElementById('characterName');
-            const classSelect = document.getElementById('characterClass');
-            const avatarSelect = document.getElementById('characterAvatar');
-            
-            const name = nameInput.value.trim();
-            const className = classSelect.value;
-            const avatar = avatarSelect.value;
-            
-            if (!name) {
-                showNotification('Ошибка', 'Введите имя персонажа', '❌');
-                return;
-            }
-            
-            // Создаем персонажа
-            const newCharacter = {
-                id: 'char_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
-                name: name,
-                class: className,
-                avatar: avatar,
-                createdAt: new Date().toISOString()
-            };
-            
-            // Сохраняем в общую базу
-            const saved = await saveCharacterToDatabase(newCharacter);
-            
-            if (saved) {
-                // Сохраняем как активного в localStorage (для текущей сессии)
-                localStorage.setItem('activeCharacter', JSON.stringify(newCharacter));
-                
-                // Создаем начальную статистику
-                const initialStats = {
-                    money: 1000,
-                    energy: 100,
-                    maxEnergy: 100,
-                    strength: 10,
-                    experience: 0,
-                    level: 1,
-                    business: {
-                        unlocked: false,
-                        businesses: []
-                    }
-                };
-                
-                // Сохраняем статистику
-                await saveCharacterStats(newCharacter.id, initialStats);
-                
-                showNotification('✅ Успешно!', 'Персонаж создан!', '🎮');
-                
-                setTimeout(() => {
-                    window.location.href = 'game-world.html';
-                }, 1500);
-            } else {
-                showNotification('❌ Ошибка', 'Не удалось создать персонажа', '❌');
-            }
-        }
-        
-        // Функция выбора персонажа
-        async function selectCharacter(characterId) {
-            const character = await getCharacterById(characterId);
-            
-            if (character) {
-                localStorage.setItem('activeCharacter', JSON.stringify(character));
-                window.location.href = 'game-world.html';
-            } else {
-                showNotification('❌ Ошибка', 'Персонаж не найден', '❌');
-            }
-        }
-        
-        // Функция загрузки списка персонажей при входе
-        async function loadCharacterList() {
-            const characters = await loadAllCharacters();
-            
-            const listContainer = document.getElementById('characterList');
-            if (listContainer) {
-                let html = '';
-                characters.forEach(char => {
-                    html += `
-                        <div class="character-item" onclick="selectCharacter('${char.id}')">
-                            <span class="character-avatar">${char.avatar || '👤'}</span>
-                            <span class="character-name">${char.name}</span>
-                            <span class="character-class">${char.class}</span>
-                        </div>
-                    `;
-                });
-                listContainer.innerHTML = html;
-            }
-        }
-        
-        // Загружаем список при загрузке страницы
-        document.addEventListener('DOMContentLoaded', function() {
-            loadCharacterList();
-        });
-    </script>
-</body>
-</html>
 </body>
 </html>
