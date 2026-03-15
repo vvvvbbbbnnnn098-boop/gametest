@@ -59,7 +59,6 @@
             justify-content: center;
         }
         
-        /* Блок навигации между страницами */
         .navigation-panel {
             background: rgba(20, 20, 20, 0.9);
             border-radius: 15px;
@@ -118,24 +117,6 @@
             border-color: #ffcc00;
             background: rgba(255, 204, 0, 0.1);
             box-shadow: 0 0 20px rgba(255, 204, 0, 0.3);
-        }
-        
-        .nav-card.admin-only {
-            position: relative;
-            border: 2px dashed rgba(255, 204, 0, 0.5);
-        }
-        
-        .admin-badge {
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            background: linear-gradient(135deg, #ff3333, #cc0000);
-            color: white;
-            font-size: 0.7em;
-            padding: 3px 8px;
-            border-radius: 10px;
-            font-weight: bold;
-            z-index: 2;
         }
         
         .nav-icon {
@@ -312,7 +293,6 @@
             color: #aaa;
         }
         
-        /* Секция выбора персонажа */
         .character-section {
             margin-top: 30px;
             border-top: 1px solid rgba(255, 204, 0, 0.3);
@@ -572,7 +552,6 @@
             background: rgba(255, 50, 50, 0.3);
         }
         
-        /* Консоль администратора и ассистента */
         .admin-console {
             background: rgba(10, 10, 30, 0.9);
             border-radius: 15px;
@@ -786,7 +765,6 @@
             display: block;
         }
         
-        /* Анимированный фон */
         .bg {
             position: fixed;
             top: 0;
@@ -802,53 +780,23 @@
         }
         
         @keyframes pulse-bg {
-            0% {
-                opacity: 0.3;
-            }
-            100% {
-                opacity: 0.7;
-            }
+            0% { opacity: 0.3; }
+            100% { opacity: 0.7; }
         }
         
         @media (max-width: 768px) {
-            .title {
-                font-size: 2em;
-            }
-            
-            .nav-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            
-            .characters-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .selected-char-preview {
-                flex-direction: column;
-                text-align: center;
-            }
-            
-            .selected-char-stats {
-                width: 100%;
-            }
-            
-            .action-buttons {
-                flex-direction: column;
-            }
-            
-            .console-controls {
-                grid-template-columns: 1fr;
-            }
-            
-            .console-stats {
-                grid-template-columns: repeat(2, 1fr);
-            }
+            .title { font-size: 2em; }
+            .nav-grid { grid-template-columns: repeat(2, 1fr); }
+            .characters-grid { grid-template-columns: 1fr; }
+            .selected-char-preview { flex-direction: column; text-align: center; }
+            .selected-char-stats { width: 100%; }
+            .action-buttons { flex-direction: column; }
+            .console-controls { grid-template-columns: 1fr; }
+            .console-stats { grid-template-columns: repeat(2, 1fr); }
         }
         
         @media (max-width: 480px) {
-            .nav-grid {
-                grid-template-columns: 1fr;
-            }
+            .nav-grid { grid-template-columns: 1fr; }
         }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -859,15 +807,11 @@
     <div class="container">
         <h1 class="title">Мой <span>аккаунт</span> и персонажи</h1>
         
-        <!-- Блок навигации между страницами -->
         <div class="navigation-panel">
             <h3 class="nav-title">
                 <i class="fas fa-compass"></i> Навигация по сайту
             </h3>
-            
-            <div id="navGrid" class="nav-grid">
-                <!-- Навигация будет динамически генерироваться -->
-            </div>
+            <div id="navGrid" class="nav-grid"></div>
         </div>
         
         <div class="content-wrapper">
@@ -876,23 +820,19 @@
                 
                 <div class="form-group">
                     <label for="username">👤 Логин:</label>
-                    <input type="text" id="username" placeholder="Введите логин" autocomplete="username">
+                    <input type="text" id="username" placeholder="Введите логин">
                 </div>
                 
                 <div class="form-group">
                     <label for="password">🔒 Пароль:</label>
-                    <input type="password" id="password" placeholder="Введите пароль" autocomplete="current-password">
+                    <input type="password" id="password" placeholder="Введите пароль">
                 </div>
                 
                 <div id="message" class="message"></div>
                 
                 <div class="auth-buttons">
-                    <button class="auth-btn login-btn" onclick="login()">
-                        Войти
-                    </button>
-                    <button class="auth-btn register-btn" onclick="register()">
-                        Регистрация
-                    </button>
+                    <button class="auth-btn login-btn" onclick="login()">Войти</button>
+                    <button class="auth-btn register-btn" onclick="register()">Регистрация</button>
                 </div>
             </div>
             
@@ -919,15 +859,12 @@
                     </div>
                 </div>
                 
-                <!-- Секция выбора персонажа -->
                 <div class="character-section">
                     <h3 class="section-title">
                         <span>👤</span> Мои персонажи
                     </h3>
                     
-                    <div id="charactersList" class="characters-grid">
-                        <!-- Персонажи будут загружены здесь -->
-                    </div>
+                    <div id="charactersList" class="characters-grid"></div>
                     
                     <div id="selectedCharacterInfo" class="selected-character-info">
                         <div class="selected-char-header">
@@ -938,9 +875,7 @@
                         </div>
                         
                         <div class="selected-char-preview">
-                            <div id="selectedCharVisual" class="selected-char-visual">
-                                👤
-                            </div>
+                            <div id="selectedCharVisual" class="selected-char-visual">👤</div>
                             <div class="selected-char-stats">
                                 <div class="char-stat-row">
                                     <div class="char-stat-name">Имя:</div>
@@ -968,62 +903,6 @@
                     </div>
                 </div>
                 
-                <!-- Консоль администратора/ассистента -->
-                <div id="adminConsole" class="admin-console">
-                    <div class="console-header">
-                        <div class="console-title">
-                            <i class="fas fa-terminal"></i> <span id="consoleTitle">Консоль администратора</span>
-                        </div>
-                        <button class="console-toggle" onclick="toggleConsole()">
-                            <i class="fas fa-chevron-up"></i> Свернуть
-                        </button>
-                    </div>
-                    
-                    <div class="console-controls">
-                        <button class="console-btn download" onclick="downloadDatabase()">
-                            <i class="fas fa-download"></i> Скачать базу данных
-                        </button>
-                        
-                        <div class="file-input-wrapper">
-                            <button class="console-btn upload">
-                                <i class="fas fa-upload"></i> Загрузить базу данных
-                            </button>
-                            <input type="file" id="databaseUpload" accept=".json" onchange="uploadDatabase(event)">
-                        </div>
-                        
-                        <button class="console-btn reset" onclick="resetDatabase()">
-                            <i class="fas fa-undo"></i> Сбросить базу данных
-                        </button>
-                        
-                        <button class="console-btn delete-all" onclick="deleteAllUsers()">
-                            <i class="fas fa-trash"></i> Удалить всех пользователей
-                        </button>
-                    </div>
-                    
-                    <div class="console-stats">
-                        <div class="console-stat">
-                            <div class="console-stat-value" id="consoleUserCount">0</div>
-                            <div class="console-stat-label">Пользователей</div>
-                        </div>
-                        <div class="console-stat">
-                            <div class="console-stat-value" id="consoleCharCount">0</div>
-                            <div class="console-stat-label">Персонажей</div>
-                        </div>
-                        <div class="console-stat">
-                            <div class="console-stat-value" id="consoleDbSize">0 KB</div>
-                            <div class="console-stat-label">Размер базы</div>
-                        </div>
-                        <div class="console-stat">
-                            <div class="console-stat-value" id="consoleLastBackup">-</div>
-                            <div class="console-stat-label">Последний бэкап</div>
-                        </div>
-                    </div>
-                    
-                    <div class="console-info">
-                        <pre id="consoleOutput">Консоль готова к работе. Выберите действие.</pre>
-                    </div>
-                </div>
-                
                 <div class="action-buttons" style="margin-top: 20px;">
                     <button id="adminConsoleBtn" class="action-btn" onclick="showAdminConsole()" style="background: rgba(255, 0, 0, 0.2); color: #ff3333; border: 2px solid #ff3333; display: none;">
                         <i class="fas fa-terminal"></i> <span id="consoleBtnText">Админ консоль</span>
@@ -1041,12 +920,13 @@
         // ===== FIREBASE НАСТРОЙКИ =====
         // ЗАМЕНИТЕ ЭТИ ДАННЫЕ НА СВОИ ИЗ КОНСОЛИ FIREBASE
         const firebaseConfig = {
-            apiKey: "AIzaSyDummyKey123456789", // ЗАМЕНИТЕ
-            authDomain: "your-app.firebaseapp.com", // ЗАМЕНИТЕ
-            projectId: "your-app", // ЗАМЕНИТЕ
-            storageBucket: "your-app.appspot.com", // ЗАМЕНИТЕ
-            messagingSenderId: "123456789", // ЗАМЕНИТЕ
-            appId: "1:123456789:web:abc123" // ЗАМЕНИТЕ
+  apiKey: "AIzaSyCpzLKgY5VQGhS60xB6uPhUaM45WzcJPDI",
+  authDomain: "gametest1-86e5d.firebaseapp.com",
+  projectId: "gametest1-86e5d",
+  storageBucket: "gametest1-86e5d.firebasestorage.app",
+  messagingSenderId: "325164779802",
+  appId: "1:325164779802:web:db4d32d3738aa00f1c84a3",
+  measurementId: "G-Y9J9VB5ZDZ"
         };
 
         // Инициализация Firebase
@@ -1090,6 +970,7 @@
                     "clothes": "Доспехи",
                     "clothesColor": "Золотой",
                     "accessory": "Нет",
+                    "avatar": "👨",
                     "created": "2026-03-15T19:23:37.820Z"
                 },
                 {
@@ -1103,8 +984,8 @@
                     "clothes": "Футболка",
                     "clothesColor": "Синий",
                     "accessory": "Нет",
-                    "created": "2026-03-15T19:25:43.466Z",
-                    "avatar": "💇 😐 👕"
+                    "avatar": "💇 😐 👕",
+                    "created": "2026-03-15T19:25:43.466Z"
                 },
                 {
                     "id": 3,
@@ -1117,8 +998,8 @@
                     "clothes": "Футболка",
                     "clothesColor": "Синий",
                     "accessory": "Нет",
-                    "created": "2026-03-15T20:04:09.251Z",
-                    "avatar": "💇 😐 👕"
+                    "avatar": "💇 😐 👕",
+                    "created": "2026-03-15T20:04:09.251Z"
                 },
                 {
                     "id": 6,
@@ -1131,94 +1012,72 @@
                     "clothes": "Футболка",
                     "clothesColor": "Синий",
                     "accessory": "Нет",
-                    "created": "2026-03-15T20:14:05.703Z",
-                    "avatar": "💇 😐 👕"
+                    "avatar": "💇 😐 👕",
+                    "created": "2026-03-15T20:14:05.703Z"
                 }
             ],
             "nextCharId": 11
         };
 
-        // ===== КЛАСС ДЛЯ РАБОТЫ С БАЗОЙ ДАННЫХ =====
-        class CloudDatabase {
+        // ===== КЛАСС ДЛЯ РАБОТЫ С FIREBASE =====
+        class FirebaseDatabase {
             constructor() {
-                this.localDbName = 'character_creator_db';
-                this.init();
+                this.dbName = 'character_creator_db';
+                this.cache = null;
             }
 
-            // Инициализация локальной базы
-            init() {
-                if (!localStorage.getItem(this.localDbName)) {
-                    // Используем вашу базу данных
-                    localStorage.setItem(this.localDbName, JSON.stringify(initialDatabase));
-                }
-            }
-
-            // Загрузка данных из облака
-            async loadFromCloud() {
+            // Загрузка данных из Firebase
+            async loadFromFirebase() {
                 try {
                     const docRef = firestore.collection('game_data').doc('main_database');
                     const docSnap = await docRef.get();
                     
                     if (docSnap.exists) {
-                        const cloudData = docSnap.data();
-                        // Обновляем локальные данные
-                        localStorage.setItem(this.localDbName, JSON.stringify(cloudData.data));
-                        console.log('✅ Данные загружены из облака');
-                        return cloudData.data;
+                        this.cache = docSnap.data().data;
+                        console.log('✅ Данные загружены из Firebase');
+                        return this.cache;
                     } else {
-                        console.log('📦 Облачных данных нет, использую локальные');
-                        // Загружаем локальные данные в облако
-                        await this.saveToCloud();
-                        return this.getDatabase();
+                        console.log('📦 Firebase пуст, загружаем начальные данные');
+                        await this.saveToFirebase(initialDatabase);
+                        this.cache = initialDatabase;
+                        return initialDatabase;
                     }
                 } catch (error) {
-                    console.error('❌ Ошибка загрузки из облака:', error);
-                    return this.getDatabase();
+                    console.error('❌ Ошибка загрузки из Firebase:', error);
+                    this.cache = initialDatabase;
+                    return initialDatabase;
                 }
             }
 
-            // Сохранение данных в облако
-            async saveToCloud(dataToSave = null) {
+            // Сохранение данных в Firebase
+            async saveToFirebase(data) {
                 try {
-                    const localData = dataToSave || this.getDatabase();
                     const docRef = firestore.collection('game_data').doc('main_database');
                     await docRef.set({ 
-                        data: localData,
+                        data: data,
                         lastUpdated: new Date().toISOString() 
                     });
-                    console.log('✅ Данные сохранены в облако');
+                    this.cache = data;
+                    console.log('✅ Данные сохранены в Firebase');
                     return true;
                 } catch (error) {
-                    console.error('❌ Ошибка сохранения в облако:', error);
+                    console.error('❌ Ошибка сохранения в Firebase:', error);
                     return false;
                 }
             }
 
-            // Получить локальную базу
-            getDatabase() {
-                const data = localStorage.getItem(this.localDbName);
-                if (!data) {
-                    return initialDatabase;
+            // Получить данные (из кэша или Firebase)
+            async getData() {
+                if (!this.cache) {
+                    await this.loadFromFirebase();
                 }
-                try {
-                    return JSON.parse(data);
-                } catch {
-                    return initialDatabase;
-                }
-            }
-
-            // Сохранить локальную базу и синхронизировать с облаком
-            async saveDatabase(db) {
-                localStorage.setItem(this.localDbName, JSON.stringify(db));
-                await this.saveToCloud(db); // Синхронизируем с облаком
+                return this.cache;
             }
 
             // ===== ПОЛЬЗОВАТЕЛИ =====
 
             async registerUser(username, password) {
-                // Сначала загружаем свежие данные из облака
-                const cloudData = await this.loadFromCloud();
-                const db = cloudData || this.getDatabase();
+                const db = await this.getData();
                 
                 // Проверяем существование пользователя
                 const existingUser = db.users.find(user => user.username.toLowerCase() === username.toLowerCase());
@@ -1239,7 +1098,7 @@
                 };
                 
                 db.users.push(newUser);
-                await this.saveDatabase(db);
+                await this.saveToFirebase(db);
                 
                 return { 
                     success: true, 
@@ -1256,16 +1115,14 @@
             }
 
             async loginUser(username, password) {
-                // Сначала загружаем свежие данные из облака
-                const cloudData = await this.loadFromCloud();
-                const db = cloudData || this.getDatabase();
+                const db = await this.getData();
                 
                 const user = db.users.find(u => u.username === username && u.password === password);
                 
                 if (user) {
                     user.lastLogin = new Date().toISOString();
                     user.loginCount = (user.loginCount || 0) + 1;
-                    await this.saveDatabase(db);
+                    await this.saveToFirebase(db);
                     
                     return { 
                         success: true, 
@@ -1286,8 +1143,8 @@
                 }
             }
 
-            getUserById(userId) {
-                const db = this.getDatabase();
+            async getUserById(userId) {
+                const db = await this.getData();
                 const user = db.users.find(u => u.id === userId);
                 
                 if (user) {
@@ -1312,24 +1169,24 @@
 
             // ===== ПЕРСОНАЖИ =====
 
-            getUserCharacters(userId) {
-                const db = this.getDatabase();
+            async getUserCharacters(userId) {
+                const db = await this.getData();
                 const characters = db.characters?.filter(char => char.userId === userId) || [];
                 return characters.sort((a, b) => new Date(b.created) - new Date(a.created));
             }
 
-            getAllCharacters() {
-                const db = this.getDatabase();
+            async getAllCharacters() {
+                const db = await this.getData();
                 return db.characters || [];
             }
 
-            getUserCharacterCount(userId) {
-                const characters = this.getUserCharacters(userId);
+            async getUserCharacterCount(userId) {
+                const characters = await this.getUserCharacters(userId);
                 return characters.length;
             }
 
-            getCharacterById(charId) {
-                const db = this.getDatabase();
+            async getCharacterById(charId) {
+                const db = await this.getData();
                 const character = db.characters?.find(char => char.id === charId);
                 
                 if (character) {
@@ -1340,7 +1197,7 @@
             }
 
             async createCharacter(userId, characterData) {
-                const db = this.getDatabase();
+                const db = await this.getData();
                 
                 const newCharId = db.nextCharId++;
                 
@@ -1361,7 +1218,7 @@
                 
                 if (!db.characters) db.characters = [];
                 db.characters.push(newCharacter);
-                await this.saveDatabase(db);
+                await this.saveToFirebase(db);
                 
                 return { 
                     success: true, 
@@ -1371,7 +1228,7 @@
             }
 
             async deleteCharacter(charId) {
-                const db = this.getDatabase();
+                const db = await this.getData();
                 const charIndex = db.characters?.findIndex(char => char.id === charId);
                 
                 if (charIndex === -1 || charIndex === undefined) {
@@ -1380,7 +1237,7 @@
                 
                 const deletedChar = db.characters[charIndex];
                 db.characters.splice(charIndex, 1);
-                await this.saveDatabase(db);
+                await this.saveToFirebase(db);
                 
                 return { 
                     success: true, 
@@ -1409,110 +1266,13 @@
 
             // ===== АДМИНИСТРАТИВНЫЕ ФУНКЦИИ =====
 
-            exportDatabase() {
-                const db = this.getDatabase();
+            async exportDatabase() {
+                const db = await this.getData();
                 return JSON.stringify(db, null, 2);
             }
 
-            async importDatabase(jsonData) {
-                try {
-                    const newDb = JSON.parse(jsonData);
-                    
-                    if (!newDb.users || !newDb.characters || newDb.nextId === undefined || newDb.nextCharId === undefined) {
-                        return { success: false, message: 'Неверный формат базы данных' };
-                    }
-                    
-                    await this.saveDatabase(newDb);
-                    
-                    localStorage.setItem('last_backup_time', new Date().toISOString());
-                    
-                    return { 
-                        success: true, 
-                        message: 'База данных успешно загружена!',
-                        stats: {
-                            users: newDb.users.length,
-                            characters: newDb.characters.length
-                        }
-                    };
-                } catch (error) {
-                    return { 
-                        success: false, 
-                        message: 'Ошибка при загрузке файла: ' + error.message 
-                    };
-                }
-            }
-
-            async resetDatabase() {
-                localStorage.removeItem(this.localDbName);
-                localStorage.setItem(this.localDbName, JSON.stringify(initialDatabase));
-                
-                // Удаляем в облаке
-                try {
-                    const docRef = firestore.collection('game_data').doc('main_database');
-                    await docRef.delete();
-                } catch (e) {
-                    console.log('Ошибка удаления облачных данных:', e);
-                }
-                
-                const keysToRemove = [];
-                for (let i = 0; i < localStorage.length; i++) {
-                    const key = localStorage.key(i);
-                    if (key.startsWith('selected_char_') || 
-                        key === 'currentUser' || 
-                        key === 'activeCharacter') {
-                        keysToRemove.push(key);
-                    }
-                }
-                
-                keysToRemove.forEach(key => localStorage.removeItem(key));
-                
-                return { 
-                    success: true, 
-                    message: 'База данных сброшена к начальному состоянию!' 
-                };
-            }
-
-            async deleteAllUsers() {
-                const db = this.getDatabase();
-                
-                const adminUsers = db.users.filter(u => u.username === 'admin' || u.isAdmin || u.isAssistant);
-                
-                db.users = adminUsers;
-                db.nextId = Math.max(...adminUsers.map(u => u.id), 2) + 1;
-                db.characters = db.characters.filter(char => adminUsers.some(u => u.id === char.userId));
-                db.nextCharId = db.characters.length > 0 ? Math.max(...db.characters.map(c => c.id)) + 1 : 1;
-                
-                await this.saveDatabase(db);
-                
-                const keysToRemove = [];
-                for (let i = 0; i < localStorage.length; i++) {
-                    const key = localStorage.key(i);
-                    if (key.startsWith('selected_char_') || 
-                        key === 'currentUser' || 
-                        key === 'activeCharacter') {
-                        keysToRemove.push(key);
-                    }
-                }
-                
-                keysToRemove.forEach(key => {
-                    const userId = key.replace('selected_char_', '');
-                    if (userId && !adminUsers.some(u => u.id === parseInt(userId))) {
-                        localStorage.removeItem(key);
-                    }
-                });
-                
-                return { 
-                    success: true, 
-                    message: 'Все пользователи удалены (кроме администраторов и ассистентов)!',
-                    stats: {
-                        users: db.users.length,
-                        characters: db.characters.length
-                    }
-                };
-            }
-
-            getDatabaseStats() {
-                const db = this.getDatabase();
+            async getDatabaseStats() {
+                const db = await this.getData();
                 const dbSize = JSON.stringify(db).length;
                 
                 return {
@@ -1522,47 +1282,17 @@
                     lastBackup: localStorage.getItem('last_backup_time') || 'Никогда'
                 };
             }
-
-            createBackup() {
-                const db = this.getDatabase();
-                const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-                const backupKey = `backup_${timestamp}`;
-                
-                localStorage.setItem(backupKey, JSON.stringify(db));
-                
-                const backups = [];
-                for (let i = 0; i < localStorage.length; i++) {
-                    const key = localStorage.key(i);
-                    if (key.startsWith('backup_')) {
-                        backups.push(key);
-                    }
-                }
-                
-                if (backups.length > 5) {
-                    backups.sort();
-                    for (let i = 0; i < backups.length - 5; i++) {
-                        localStorage.removeItem(backups[i]);
-                    }
-                }
-                
-                return { 
-                    success: true, 
-                    message: 'Резервная копия создана!',
-                    backupKey: backupKey
-                };
-            }
         }
 
         // ===== ИНИЦИАЛИЗАЦИЯ =====
         
-        const cloudDb = new CloudDatabase();
+        const firebaseDb = new FirebaseDatabase();
         let currentUser = null;
         let selectedCharacter = null;
         let isConsoleVisible = false;
 
-        // Загружаем данные из облака при старте
         async function initializeApp() {
-            await cloudDb.loadFromCloud();
+            await firebaseDb.loadFromFirebase();
             restoreSession();
         }
 
@@ -1578,6 +1308,7 @@
         
         function showConsoleMessage(text, type = 'info') {
             const consoleEl = document.getElementById('consoleOutput');
+            if (!consoleEl) return;
             const timestamp = new Date().toLocaleTimeString();
             let color = '#00ff00';
             
@@ -1638,13 +1369,13 @@
             });
         }
         
-        function showUserPanel(user) {
+        async function showUserPanel(user) {
             currentUser = user;
             
             document.getElementById('currentUser').textContent = user.username;
             document.getElementById('userId').textContent = user.id;
             
-            const charCount = cloudDb.getUserCharacterCount(user.id);
+            const charCount = await firebaseDb.getUserCharacterCount(user.id);
             document.getElementById('charCount').textContent = charCount;
             
             const createdDate = new Date(user.created);
@@ -1653,8 +1384,6 @@
             const adminBadge = document.getElementById('adminBadge');
             const assistantBadge = document.getElementById('assistantBadge');
             const adminConsoleBtn = document.getElementById('adminConsoleBtn');
-            const consoleTitle = document.getElementById('consoleTitle');
-            const consoleBtnText = document.getElementById('consoleBtnText');
             const consoleEl = document.getElementById('adminConsole');
             
             if (user.isAdmin) {
@@ -1664,42 +1393,23 @@
                 adminConsoleBtn.style.background = 'rgba(255, 0, 0, 0.2)';
                 adminConsoleBtn.style.color = '#ff3333';
                 adminConsoleBtn.style.border = '2px solid #ff3333';
-                consoleBtnText.textContent = 'Админ консоль';
-                consoleTitle.textContent = 'Консоль администратора';
-                consoleEl.classList.remove('assistant-console');
                 
                 updateNavigationPanel(true);
-                showAdminConsole();
-            } else if (user.isAssistant) {
-                adminBadge.style.display = 'none';
-                assistantBadge.style.display = 'inline-block';
-                adminConsoleBtn.style.display = 'block';
-                adminConsoleBtn.style.background = 'rgba(76, 175, 80, 0.2)';
-                adminConsoleBtn.style.color = '#4CAF50';
-                adminConsoleBtn.style.border = '2px solid #4CAF50';
-                consoleBtnText.textContent = 'Консоль ассистента';
-                consoleTitle.textContent = 'Консоль ассистента';
-                consoleEl.classList.add('assistant-console');
-                
-                updateNavigationPanel(true);
-                showAdminConsole();
             } else {
                 adminBadge.style.display = 'none';
                 assistantBadge.style.display = 'none';
                 adminConsoleBtn.style.display = 'none';
                 updateNavigationPanel(false);
-                consoleEl.style.display = 'none';
+                if (consoleEl) consoleEl.style.display = 'none';
             }
             
             document.getElementById('userPanel').classList.add('show');
             document.getElementById('authForm').style.display = 'none';
             
-            loadUserCharacters();
-            loadSelectedCharacter();
+            await loadUserCharacters();
+            await loadSelectedCharacter();
             
             localStorage.setItem('currentUser', JSON.stringify(user));
-            
-            updateConsoleStats();
         }
         
         function hideUserPanel() {
@@ -1722,11 +1432,11 @@
                 return;
             }
             
-            const result = await cloudDb.loginUser(username, password);
+            const result = await firebaseDb.loginUser(username, password);
             
             if (result.success) {
                 showMessage('✅ Вход выполнен успешно!', 'success');
-                showUserPanel(result.user);
+                await showUserPanel(result.user);
             } else {
                 showMessage(`❌ ${result.message}`, 'error');
             }
@@ -1751,15 +1461,15 @@
                 return;
             }
             
-            const result = await cloudDb.registerUser(username, password);
+            const result = await firebaseDb.registerUser(username, password);
             
             if (result.success) {
                 showMessage(`✅ ${result.message}`, 'success');
                 document.getElementById('username').value = '';
                 document.getElementById('password').value = '';
                 
-                setTimeout(() => {
-                    showUserPanel(result.user);
+                setTimeout(async () => {
+                    await showUserPanel(result.user);
                 }, 1000);
             } else {
                 showMessage(`❌ ${result.message}`, 'error');
@@ -1775,10 +1485,10 @@
         
         // ===== ФУНКЦИИ РАБОТЫ С ПЕРСОНАЖАМИ =====
         
-        function loadUserCharacters() {
+        async function loadUserCharacters() {
             if (!currentUser) return;
             
-            const characters = cloudDb.getUserCharacters(currentUser.id);
+            const characters = await firebaseDb.getUserCharacters(currentUser.id);
             const charactersList = document.getElementById('charactersList');
             
             charactersList.innerHTML = '';
@@ -1830,10 +1540,10 @@
             document.getElementById('charCount').textContent = characters.length;
         }
         
-        function loadSelectedCharacter() {
+        async function loadSelectedCharacter() {
             if (!currentUser) return;
             
-            const result = cloudDb.getUserSelectedCharacter(currentUser.id);
+            const result = await firebaseDb.getUserSelectedCharacter(currentUser.id);
             const selectedInfo = document.getElementById('selectedCharacterInfo');
             
             if (result.success) {
@@ -1862,7 +1572,7 @@
         function selectCharacter(charId) {
             if (!currentUser) return;
             
-            const result = cloudDb.setUserSelectedCharacter(currentUser.id, charId);
+            const result = firebaseDb.setUserSelectedCharacter(currentUser.id, charId);
             if (result.success) {
                 loadSelectedCharacter();
                 showMessage('✅ Персонаж выбран!', 'success');
@@ -1872,7 +1582,7 @@
         function deselectCharacter() {
             if (!currentUser) return;
             
-            const result = cloudDb.clearUserSelectedCharacter(currentUser.id);
+            const result = firebaseDb.clearUserSelectedCharacter(currentUser.id);
             if (result.success) {
                 selectedCharacter = null;
                 document.getElementById('selectedCharacterInfo').classList.remove('show');
@@ -1889,15 +1599,14 @@
                 return;
             }
             
-            const result = await cloudDb.deleteCharacter(charId);
+            const result = await firebaseDb.deleteCharacter(charId);
             if (result.success) {
                 if (selectedCharacter && selectedCharacter.id === charId) {
                     deselectCharacter();
                 }
                 
-                loadUserCharacters();
+                await loadUserCharacters();
                 showMessage('✅ Персонаж удален', 'success');
-                updateConsoleStats();
             } else {
                 showMessage(`❌ ${result.message}`, 'error');
             }
@@ -1917,61 +1626,59 @@
             window.location.href = 'game-world.html';
         }
         
-        // ===== КОНСОЛЬ АДМИНИСТРАТОРА/АССИСТЕНТА =====
+        // ===== КОНСОЛЬ АДМИНИСТРАТОРА =====
         
         function showAdminConsole() {
-            if (!currentUser || (!currentUser.isAdmin && !currentUser.isAssistant)) return;
+            if (!currentUser || !currentUser.isAdmin) return;
             
             const consoleEl = document.getElementById('adminConsole');
-            const toggleBtn = consoleEl.querySelector('.console-toggle i');
+            if (!consoleEl) return;
             
             if (!isConsoleVisible) {
                 consoleEl.style.display = 'block';
-                toggleBtn.className = 'fas fa-chevron-up';
                 isConsoleVisible = true;
                 updateConsoleStats();
-                showConsoleMessage(`Консоль ${currentUser.isAdmin ? 'администратора' : 'ассистента'} активирована`, 'success');
             }
         }
         
         function toggleConsole() {
-            if (!currentUser || (!currentUser.isAdmin && !currentUser.isAssistant)) return;
+            if (!currentUser || !currentUser.isAdmin) return;
             
             const consoleEl = document.getElementById('adminConsole');
-            const toggleBtn = consoleEl.querySelector('.console-toggle i');
+            if (!consoleEl) return;
             
             if (isConsoleVisible) {
                 consoleEl.style.display = 'none';
-                toggleBtn.className = 'fas fa-chevron-down';
                 isConsoleVisible = false;
             } else {
                 consoleEl.style.display = 'block';
-                toggleBtn.className = 'fas fa-chevron-up';
                 isConsoleVisible = true;
                 updateConsoleStats();
             }
         }
         
-        function updateConsoleStats() {
-            if (!currentUser || (!currentUser.isAdmin && !currentUser.isAssistant)) return;
+        async function updateConsoleStats() {
+            if (!currentUser || !currentUser.isAdmin) return;
             
-            const stats = cloudDb.getDatabaseStats();
+            const stats = await firebaseDb.getDatabaseStats();
             
-            document.getElementById('consoleUserCount').textContent = stats.users;
-            document.getElementById('consoleCharCount').textContent = stats.characters;
-            document.getElementById('consoleDbSize').textContent = stats.dbSize;
-            document.getElementById('consoleLastBackup').textContent = 
-                stats.lastBackup === 'Никогда' ? 'Никогда' : new Date(stats.lastBackup).toLocaleString();
+            const userCountEl = document.getElementById('consoleUserCount');
+            const charCountEl = document.getElementById('consoleCharCount');
+            const dbSizeEl = document.getElementById('consoleDbSize');
+            
+            if (userCountEl) userCountEl.textContent = stats.users;
+            if (charCountEl) charCountEl.textContent = stats.characters;
+            if (dbSizeEl) dbSizeEl.textContent = stats.dbSize;
         }
         
-        function downloadDatabase() {
-            if (!currentUser || (!currentUser.isAdmin && !currentUser.isAssistant)) {
-                showConsoleMessage('Доступ запрещен! Только для администраторов и ассистентов.', 'error');
+        async function downloadDatabase() {
+            if (!currentUser || !currentUser.isAdmin) {
+                showConsoleMessage('Доступ запрещен! Только для администраторов.', 'error');
                 return;
             }
             
             try {
-                const data = cloudDb.exportDatabase();
+                const data = await firebaseDb.exportDatabase();
                 const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
                 const filename = `character_database_backup_${timestamp}.json`;
                 
@@ -1986,117 +1693,9 @@
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
                 
-                cloudDb.createBackup();
-                
                 showConsoleMessage(`База данных скачана как ${filename}`, 'success');
-                updateConsoleStats();
             } catch (error) {
                 showConsoleMessage(`Ошибка при скачивании: ${error.message}`, 'error');
-            }
-        }
-        
-        async function uploadDatabase(event) {
-            if (!currentUser || (!currentUser.isAdmin && !currentUser.isAssistant)) {
-                showConsoleMessage('Доступ запрещен! Только для администраторов и ассистентов.', 'error');
-                return;
-            }
-            
-            const file = event.target.files[0];
-            if (!file) return;
-            
-            if (!file.name.endsWith('.json')) {
-                showConsoleMessage('Пожалуйста, выберите JSON файл', 'error');
-                return;
-            }
-            
-            if (!confirm('ВНИМАНИЕ: Это перезапишет текущую базу данных. Продолжить?')) {
-                event.target.value = '';
-                return;
-            }
-            
-            const reader = new FileReader();
-            
-            reader.onload = async function(e) {
-                try {
-                    const result = await cloudDb.importDatabase(e.target.result);
-                    
-                    if (result.success) {
-                        showConsoleMessage(`✅ ${result.message}`, 'success');
-                        showConsoleMessage(`Загружено: ${result.stats.users} пользователей, ${result.stats.characters} персонажей`, 'info');
-                        
-                        updateConsoleStats();
-                        
-                        if (currentUser) {
-                            const userCheck = await cloudDb.getUserById(currentUser.id);
-                            if (userCheck.success) {
-                                showUserPanel(userCheck.user);
-                            }
-                        }
-                    } else {
-                        showConsoleMessage(`❌ ${result.message}`, 'error');
-                    }
-                } catch (error) {
-                    showConsoleMessage(`Ошибка при обработке файла: ${error.message}`, 'error');
-                }
-                
-                event.target.value = '';
-            };
-            
-            reader.onerror = function() {
-                showConsoleMessage('Ошибка при чтении файла', 'error');
-                event.target.value = '';
-            };
-            
-            reader.readAsText(file);
-        }
-        
-        async function resetDatabase() {
-            if (!currentUser || (!currentUser.isAdmin && !currentUser.isAssistant)) {
-                showConsoleMessage('Доступ запрещен! Только для администраторов и ассистентов.', 'error');
-                return;
-            }
-            
-            if (!confirm('ВНИМАНИЕ: Это полностью сбросит базу данных к начальному состоянию. Все пользователи и персонажи будут удалены. Продолжить?')) {
-                return;
-            }
-            
-            const result = await cloudDb.resetDatabase();
-            
-            if (result.success) {
-                showConsoleMessage(`✅ ${result.message}`, 'success');
-                updateConsoleStats();
-                
-                logout();
-            }
-        }
-        
-        async function deleteAllUsers() {
-            if (!currentUser || (!currentUser.isAdmin && !currentUser.isAssistant)) {
-                showConsoleMessage('Доступ запрещен! Только для администраторов и ассистентов.', 'error');
-                return;
-            }
-            
-            if (!confirm('ВНИМАНИЕ: Это удалит всех пользователей кроме администраторов и ассистентов. Все персонажи обычных пользователей также будут удалены. Продолжить?')) {
-                return;
-            }
-            
-            const result = await cloudDb.deleteAllUsers();
-            
-            if (result.success) {
-                showConsoleMessage(`✅ ${result.message}`, 'success');
-                showConsoleMessage(`Осталось: ${result.stats.users} пользователей, ${result.stats.characters} персонажей`, 'info');
-                
-                updateConsoleStats();
-                
-                if (currentUser && !currentUser.isAdmin && !currentUser.isAssistant) {
-                    showConsoleMessage('Ваш аккаунт был удален. Выход из системы...', 'warning');
-                    setTimeout(() => {
-                        logout();
-                    }, 2000);
-                } else {
-                    loadUserCharacters();
-                    loadSelectedCharacter();
-                }
             }
         }
         
@@ -2106,10 +1705,10 @@
             if (savedUser) {
                 try {
                     const user = JSON.parse(savedUser);
-                    const userCheck = await cloudDb.getUserById(user.id);
+                    const userCheck = await firebaseDb.getUserById(user.id);
                     
                     if (userCheck.success) {
-                        showUserPanel(userCheck.user);
+                        await showUserPanel(userCheck.user);
                     } else {
                         localStorage.removeItem('currentUser');
                     }
