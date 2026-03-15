@@ -2160,5 +2160,194 @@
             passwordInput.addEventListener('keypress', handleEnterKey);
         });
     </script>
+    <!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Создание персонажа</title>
+    <style>
+        /* Ваши стили */
+    </style>
+</head>
+<body>
+    <!-- Ваша разметка -->
+
+    <script>
+        // Функция для сохранения персонажа в общую базу
+        async function saveCharacterToDatabase(character) {
+            try {
+                const response = await fetch('db.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'save',
+                        character: character
+                    })
+                });
+                
+                const result = await response.json();
+                return result.success;
+            } catch (error) {
+                console.error('Ошибка сохранения в базу:', error);
+                return false;
+            }
+        }
+        
+        // Функция для загрузки всех персонажей
+        async function loadAllCharacters() {
+            try {
+                const response = await fetch('db.php');
+                const data = await response.json();
+                return data.characters || [];
+            } catch (error) {
+                console.error('Ошибка загрузки персонажей:', error);
+                return [];
+            }
+        }
+        
+        // Функция для получения персонажа по ID
+        async function getCharacterById(characterId) {
+            try {
+                const response = await fetch('db.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'get',
+                        characterId: characterId
+                    })
+                });
+                
+                return await response.json();
+            } catch (error) {
+                console.error('Ошибка загрузки персонажа:', error);
+                return null;
+            }
+        }
+        
+        // Функция для сохранения статистики персонажа
+        async function saveCharacterStats(characterId, stats) {
+            try {
+                const response = await fetch('db.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'updateStats',
+                        characterId: characterId,
+                        stats: stats
+                    })
+                });
+                
+                const result = await response.json();
+                return result.success;
+            } catch (error) {
+                console.error('Ошибка сохранения статистики:', error);
+                return false;
+            }
+        }
+        
+        // Функция создания персонажа (исправленная)
+        async function createCharacter() {
+            const nameInput = document.getElementById('characterName');
+            const classSelect = document.getElementById('characterClass');
+            const avatarSelect = document.getElementById('characterAvatar');
+            
+            const name = nameInput.value.trim();
+            const className = classSelect.value;
+            const avatar = avatarSelect.value;
+            
+            if (!name) {
+                showNotification('Ошибка', 'Введите имя персонажа', '❌');
+                return;
+            }
+            
+            // Создаем персонажа
+            const newCharacter = {
+                id: 'char_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+                name: name,
+                class: className,
+                avatar: avatar,
+                createdAt: new Date().toISOString()
+            };
+            
+            // Сохраняем в общую базу
+            const saved = await saveCharacterToDatabase(newCharacter);
+            
+            if (saved) {
+                // Сохраняем как активного в localStorage (для текущей сессии)
+                localStorage.setItem('activeCharacter', JSON.stringify(newCharacter));
+                
+                // Создаем начальную статистику
+                const initialStats = {
+                    money: 1000,
+                    energy: 100,
+                    maxEnergy: 100,
+                    strength: 10,
+                    experience: 0,
+                    level: 1,
+                    business: {
+                        unlocked: false,
+                        businesses: []
+                    }
+                };
+                
+                // Сохраняем статистику
+                await saveCharacterStats(newCharacter.id, initialStats);
+                
+                showNotification('✅ Успешно!', 'Персонаж создан!', '🎮');
+                
+                setTimeout(() => {
+                    window.location.href = 'game-world.html';
+                }, 1500);
+            } else {
+                showNotification('❌ Ошибка', 'Не удалось создать персонажа', '❌');
+            }
+        }
+        
+        // Функция выбора персонажа
+        async function selectCharacter(characterId) {
+            const character = await getCharacterById(characterId);
+            
+            if (character) {
+                localStorage.setItem('activeCharacter', JSON.stringify(character));
+                window.location.href = 'game-world.html';
+            } else {
+                showNotification('❌ Ошибка', 'Персонаж не найден', '❌');
+            }
+        }
+        
+        // Функция загрузки списка персонажей при входе
+        async function loadCharacterList() {
+            const characters = await loadAllCharacters();
+            
+            const listContainer = document.getElementById('characterList');
+            if (listContainer) {
+                let html = '';
+                characters.forEach(char => {
+                    html += `
+                        <div class="character-item" onclick="selectCharacter('${char.id}')">
+                            <span class="character-avatar">${char.avatar || '👤'}</span>
+                            <span class="character-name">${char.name}</span>
+                            <span class="character-class">${char.class}</span>
+                        </div>
+                    `;
+                });
+                listContainer.innerHTML = html;
+            }
+        }
+        
+        // Загружаем список при загрузке страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCharacterList();
+        });
+    </script>
+</body>
+</html>
 </body>
 </html>
