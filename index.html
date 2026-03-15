@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>Персонаж - Мой аккаунт</title>
     
     <style>
@@ -213,6 +213,11 @@
         .auth-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(255, 204, 0, 0.3);
+        }
+        
+        .auth-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
         
         .user-panel {
@@ -765,6 +770,48 @@
             display: block;
         }
         
+        .message.warning {
+            background: rgba(255, 165, 0, 0.1);
+            border: 1px solid rgba(255, 165, 0, 0.3);
+            color: #ffaa00;
+            display: block;
+        }
+        
+        /* Debug панель для мобильных устройств */
+        .debug-panel {
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #ffcc00;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 12px;
+            font-family: monospace;
+            display: none;
+        }
+        
+        .debug-panel.show {
+            display: block;
+        }
+        
+        .debug-title {
+            color: #ffcc00;
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .debug-content {
+            color: #0f0;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        
+        .debug-close {
+            cursor: pointer;
+            color: #ff6666;
+        }
+        
         /* Анимированный фон */
         .bg {
             position: fixed;
@@ -1015,149 +1062,348 @@
             </div>
         </div>
     </div>
+    
+    <!-- Debug панель для мобильных устройств (скрыта по умолчанию) -->
+    <div id="debugPanel" class="debug-panel">
+        <div class="debug-title">
+            <span>🔧 Отладка</span>
+            <span class="debug-close" onclick="hideDebugPanel()">✕</span>
+        </div>
+        <div id="debugContent" class="debug-content"></div>
+    </div>
 
     <script>
-        // ===== СИСТЕМА БАЗЫ ДАННЫХ =====
+        // ===== УЛУЧШЕННАЯ СИСТЕМА БАЗЫ ДАННЫХ С ПОДДЕРЖКОЙ МОБИЛЬНЫХ УСТРОЙСТВ =====
         
         class UserDatabase {
             constructor() {
                 this.dbName = 'character_creator_db';
+                this.storageAvailable = this.checkStorageAvailability();
                 this.init();
             }
             
-            // Инициализация базы данных
-            init() {
-                if (!localStorage.getItem(this.dbName)) {
-                    const initialData = {
-                        users: [
-                            {
-                                id: 1,
-                                username: 'admin',
-                                password: 'admin123',
-                                created: new Date().toISOString(),
-                                lastLogin: new Date().toISOString(),
-                                loginCount: 1,
-                                isAdmin: true,
-                                isAssistant: false
-                            }
-                        ],
-                        nextId: 2,
-                        characters: [
-                            {
-                                id: 1,
-                                userId: 1,
-                                name: "Герой Админ",
-                                class: "Воин",
-                                avatar: "👨",
-                                created: new Date().toISOString(),
-                            }
-                        ],
-                        nextCharId: 2
-                    };
-                    localStorage.setItem(this.dbName, JSON.stringify(initialData));
+            // Проверка доступности localStorage
+            checkStorageAvailability() {
+                try {
+                    const test = '__storage_test__';
+                    localStorage.setItem(test, test);
+                    localStorage.removeItem(test);
+                    return true;
+                } catch (e) {
+                    console.error('localStorage недоступен:', e);
+                    return false;
                 }
             }
             
-            // Получить базу данных
-            getDatabase() {
-                return JSON.parse(localStorage.getItem(this.dbName) || '{"users":[], "characters":[], "nextId": 1, "nextCharId": 1}');
+            // Показать ошибку хранилища
+            showStorageError() {
+                const errorMessage = 'Хранилище недоступно. Проверьте: \n' +
+                                    '1. Не включён ли режим инкогнито\n' +
+                                    '2. Разрешены ли файлы cookie\n' +
+                                    '3. Достаточно ли места в хранилище';
+                
+                const messageEl = document.getElementById('message');
+                if (messageEl) {
+                    messageEl.textContent = '❌ ' + errorMessage;
+                    messageEl.className = 'message error';
+                }
+                
+                return errorMessage;
             }
             
-            // Сохранить базу данных
+            // Инициализация базы данных с проверкой
+            init() {
+                if (!this.storageAvailable) {
+                    this.showStorageError();
+                    return;
+                }
+                
+                try {
+                    if (!localStorage.getItem(this.dbName)) {
+                        const initialData = {
+                            users: [
+                                {
+                                    id: 1,
+                                    username: 'admin',
+                                    password: 'admin123',
+                                    created: new Date().toISOString(),
+                                    lastLogin: new Date().toISOString(),
+                                    loginCount: 1,
+                                    isAdmin: true,
+                                    isAssistant: false
+                                }
+                            ],
+                            nextId: 2,
+                            characters: [
+                                {
+                                    id: 1,
+                                    userId: 1,
+                                    name: "Герой Админ",
+                                    class: "Воин",
+                                    avatar: "👨",
+                                    created: new Date().toISOString(),
+                                }
+                            ],
+                            nextCharId: 2
+                        };
+                        localStorage.setItem(this.dbName, JSON.stringify(initialData));
+                    }
+                    
+                    // Тест мобильного хранилища
+                    this.testMobileStorage();
+                    
+                } catch (error) {
+                    console.error('Ошибка инициализации БД:', error);
+                    this.showStorageError();
+                }
+            }
+            
+            // Тест для мобильных устройств
+            testMobileStorage() {
+                try {
+                    const mobileTest = 'mobile_test_' + Date.now();
+                    const testValue = 'test_value';
+                    localStorage.setItem(mobileTest, testValue);
+                    const retrieved = localStorage.getItem(mobileTest);
+                    localStorage.removeItem(mobileTest);
+                    
+                    if (retrieved !== testValue) {
+                        console.warn('⚠️ Мобильное хранилище работает некорректно');
+                        this.showDebugInfo('Мобильное хранилище: проблемы с записью/чтением');
+                    } else {
+                        console.log('✅ Мобильное хранилище работает нормально');
+                    }
+                } catch (e) {
+                    console.error('❌ Ошибка теста мобильного хранилища:', e);
+                }
+            }
+            
+            // Показать отладочную информацию
+            showDebugInfo(message) {
+                const debugPanel = document.getElementById('debugPanel');
+                const debugContent = document.getElementById('debugContent');
+                
+                if (debugPanel && debugContent) {
+                    const timestamp = new Date().toLocaleTimeString();
+                    debugContent.innerHTML = `[${timestamp}] ${message}<br>` + debugContent.innerHTML;
+                    debugPanel.classList.add('show');
+                }
+            }
+            
+            // Получить базу данных с обработкой ошибок
+            getDatabase() {
+                if (!this.storageAvailable) {
+                    return { users: [], characters: [], nextId: 1, nextCharId: 1 };
+                }
+                
+                try {
+                    const data = localStorage.getItem(this.dbName);
+                    if (!data) {
+                        return { users: [], characters: [], nextId: 1, nextCharId: 1 };
+                    }
+                    return JSON.parse(data);
+                } catch (error) {
+                    console.error('Ошибка чтения БД:', error);
+                    this.showDebugInfo('Ошибка чтения БД: ' + error.message);
+                    return { users: [], characters: [], nextId: 1, nextCharId: 1 };
+                }
+            }
+            
+            // Сохранить базу данных с проверкой
             saveDatabase(db) {
-                localStorage.setItem(this.dbName, JSON.stringify(db));
+                if (!this.storageAvailable) {
+                    this.showStorageError();
+                    return false;
+                }
+                
+                try {
+                    const jsonData = JSON.stringify(db);
+                    
+                    // Проверка размера данных
+                    if (jsonData.length > 5000000) { // 5MB лимит
+                        throw new Error('Слишком большой объем данных');
+                    }
+                    
+                    localStorage.setItem(this.dbName, jsonData);
+                    
+                    // Проверка сохранения
+                    const saved = localStorage.getItem(this.dbName);
+                    if (!saved) {
+                        throw new Error('Данные не сохранились');
+                    }
+                    
+                    return true;
+                } catch (error) {
+                    console.error('Ошибка сохранения БД:', error);
+                    this.showDebugInfo('Ошибка сохранения БД: ' + error.message);
+                    
+                    // Показываем пользователю понятную ошибку
+                    const messageEl = document.getElementById('message');
+                    if (messageEl) {
+                        messageEl.textContent = '❌ Ошибка сохранения. Возможно, недостаточно места.';
+                        messageEl.className = 'message error';
+                    }
+                    
+                    return false;
+                }
             }
             
             // ===== ПОЛЬЗОВАТЕЛИ =====
             
-            // Регистрация пользователя
+            // Регистрация пользователя с улучшенной обработкой
             registerUser(username, password) {
-                const db = this.getDatabase();
-                
-                const existingUser = db.users.find(user => user.username.toLowerCase() === username.toLowerCase());
-                if (existingUser) {
-                    return { success: false, message: 'Пользователь уже существует' };
+                if (!this.storageAvailable) {
+                    return { 
+                        success: false, 
+                        message: this.showStorageError() 
+                    };
                 }
                 
-                const newUser = {
-                    id: db.nextId++,
-                    username: username,
-                    password: password,
-                    created: new Date().toISOString(),
-                    lastLogin: new Date().toISOString(),
-                    loginCount: 1,
-                    isAdmin: false,
-                    isAssistant: false
-                };
-                
-                db.users.push(newUser);
-                this.saveDatabase(db);
-                
-                return { 
-                    success: true, 
-                    message: 'Регистрация успешна!',
-                    user: { 
-                        id: newUser.id, 
-                        username: newUser.username,
-                        created: newUser.created,
-                        loginCount: newUser.loginCount,
+                try {
+                    const db = this.getDatabase();
+                    
+                    // Проверка на существующего пользователя
+                    const existingUser = db.users.find(user => user.username.toLowerCase() === username.toLowerCase());
+                    if (existingUser) {
+                        return { success: false, message: 'Пользователь уже существует' };
+                    }
+                    
+                    const newUser = {
+                        id: db.nextId++,
+                        username: username,
+                        password: password,
+                        created: new Date().toISOString(),
+                        lastLogin: new Date().toISOString(),
+                        loginCount: 1,
                         isAdmin: false,
                         isAssistant: false
+                    };
+                    
+                    db.users.push(newUser);
+                    
+                    // Убеждаемся, что массив characters существует
+                    if (!db.characters) {
+                        db.characters = [];
                     }
-                };
+                    
+                    const saved = this.saveDatabase(db);
+                    
+                    if (!saved) {
+                        return { success: false, message: 'Ошибка сохранения на устройстве' };
+                    }
+                    
+                    // Проверяем, действительно ли пользователь сохранился
+                    const verifyDb = this.getDatabase();
+                    const savedUser = verifyDb.users.find(u => u.id === newUser.id);
+                    
+                    if (!savedUser) {
+                        this.showDebugInfo('Пользователь не найден после сохранения');
+                        return { success: false, message: 'Ошибка верификации сохранения' };
+                    }
+                    
+                    this.showDebugInfo(`✅ Пользователь ${username} успешно зарегистрирован (ID: ${newUser.id})`);
+                    
+                    return { 
+                        success: true, 
+                        message: 'Регистрация успешна!',
+                        user: { 
+                            id: newUser.id, 
+                            username: newUser.username,
+                            created: newUser.created,
+                            loginCount: newUser.loginCount,
+                            isAdmin: false,
+                            isAssistant: false
+                        }
+                    };
+                    
+                } catch (error) {
+                    console.error('Ошибка регистрации:', error);
+                    this.showDebugInfo('Ошибка регистрации: ' + error.message);
+                    return { 
+                        success: false, 
+                        message: 'Ошибка при регистрации: ' + error.message 
+                    };
+                }
             }
             
             // Авторизация пользователя
             loginUser(username, password) {
-                const db = this.getDatabase();
-                const user = db.users.find(u => u.username === username && u.password === password);
-                
-                if (user) {
-                    user.lastLogin = new Date().toISOString();
-                    user.loginCount = (user.loginCount || 0) + 1;
-                    this.saveDatabase(db);
-                    
-                    return { 
-                        success: true, 
-                        user: { 
-                            id: user.id, 
-                            username: user.username,
-                            created: user.created,
-                            loginCount: user.loginCount,
-                            isAdmin: user.isAdmin || false,
-                            isAssistant: user.isAssistant || false
-                        }
-                    };
-                } else {
+                if (!this.storageAvailable) {
                     return { 
                         success: false, 
-                        message: 'Неверный логин или пароль' 
+                        message: this.showStorageError() 
+                    };
+                }
+                
+                try {
+                    const db = this.getDatabase();
+                    const user = db.users.find(u => u.username === username && u.password === password);
+                    
+                    if (user) {
+                        user.lastLogin = new Date().toISOString();
+                        user.loginCount = (user.loginCount || 0) + 1;
+                        this.saveDatabase(db);
+                        
+                        this.showDebugInfo(`✅ Пользователь ${username} вошел в систему`);
+                        
+                        return { 
+                            success: true, 
+                            user: { 
+                                id: user.id, 
+                                username: user.username,
+                                created: user.created,
+                                loginCount: user.loginCount,
+                                isAdmin: user.isAdmin || false,
+                                isAssistant: user.isAssistant || false
+                            }
+                        };
+                    } else {
+                        this.showDebugInfo(`❌ Неудачная попытка входа для ${username}`);
+                        return { 
+                            success: false, 
+                            message: 'Неверный логин или пароль' 
+                        };
+                    }
+                } catch (error) {
+                    console.error('Ошибка входа:', error);
+                    return { 
+                        success: false, 
+                        message: 'Ошибка при входе' 
                     };
                 }
             }
             
             // Получить пользователя по ID
             getUserById(userId) {
-                const db = this.getDatabase();
-                const user = db.users.find(u => u.id === userId);
+                if (!this.storageAvailable) {
+                    return { success: false, message: 'Хранилище недоступно' };
+                }
                 
-                if (user) {
-                    return { 
-                        success: true, 
-                        user: { 
-                            id: user.id, 
-                            username: user.username,
-                            created: user.created,
-                            loginCount: user.loginCount || 1,
-                            isAdmin: user.isAdmin || false,
-                            isAssistant: user.isAssistant || false
-                        }
-                    };
-                } else {
-                    return { 
-                        success: false, 
-                        message: 'Пользователь не найден' 
-                    };
+                try {
+                    const db = this.getDatabase();
+                    const user = db.users.find(u => u.id === userId);
+                    
+                    if (user) {
+                        return { 
+                            success: true, 
+                            user: { 
+                                id: user.id, 
+                                username: user.username,
+                                created: user.created,
+                                loginCount: user.loginCount || 1,
+                                isAdmin: user.isAdmin || false,
+                                isAssistant: user.isAssistant || false
+                            }
+                        };
+                    } else {
+                        return { 
+                            success: false, 
+                            message: 'Пользователь не найден' 
+                        };
+                    }
+                } catch (error) {
+                    console.error('Ошибка получения пользователя:', error);
+                    return { success: false, message: 'Ошибка получения пользователя' };
                 }
             }
             
@@ -1165,9 +1411,16 @@
             
             // Получить всех персонажей пользователя
             getUserCharacters(userId) {
-                const db = this.getDatabase();
-                const characters = db.characters?.filter(char => char.userId === userId) || [];
-                return characters.sort((a, b) => new Date(b.created) - new Date(a.created));
+                if (!this.storageAvailable) return [];
+                
+                try {
+                    const db = this.getDatabase();
+                    const characters = db.characters?.filter(char => char.userId === userId) || [];
+                    return characters.sort((a, b) => new Date(b.created) - new Date(a.created));
+                } catch (error) {
+                    console.error('Ошибка получения персонажей:', error);
+                    return [];
+                }
             }
             
             // Получить количество персонажей пользователя
@@ -1178,96 +1431,175 @@
             
             // Получить персонажа по ID
             getCharacterById(charId) {
-                const db = this.getDatabase();
-                const character = db.characters?.find(char => char.id === charId);
+                if (!this.storageAvailable) {
+                    return { success: false, message: 'Хранилище недоступно' };
+                }
                 
-                if (character) {
-                    return { success: true, character: character };
-                } else {
-                    return { success: false, message: 'Персонаж не найден' };
+                try {
+                    const db = this.getDatabase();
+                    const character = db.characters?.find(char => char.id === charId);
+                    
+                    if (character) {
+                        return { success: true, character: character };
+                    } else {
+                        return { success: false, message: 'Персонаж не найден' };
+                    }
+                } catch (error) {
+                    console.error('Ошибка получения персонажа:', error);
+                    return { success: false, message: 'Ошибка получения персонажа' };
                 }
             }
             
             // Создать нового персонажа
             createCharacter(userId, characterData) {
-                const db = this.getDatabase();
+                if (!this.storageAvailable) {
+                    return { success: false, message: 'Хранилище недоступно' };
+                }
                 
-                const newCharId = db.nextCharId++;
-                
-                const newCharacter = {
-                    id: newCharId,
-                    userId: userId,
-                    name: characterData.name,
-                    class: characterData.class,
-                    avatar: characterData.avatar || '👤',
-                    created: new Date().toISOString(),
-                };
-                
-                if (!db.characters) db.characters = [];
-                db.characters.push(newCharacter);
-                this.saveDatabase(db);
-                
-                return { 
-                    success: true, 
-                    message: 'Персонаж создан!',
-                    character: newCharacter 
-                };
+                try {
+                    const db = this.getDatabase();
+                    
+                    const newCharId = db.nextCharId++;
+                    
+                    const newCharacter = {
+                        id: newCharId,
+                        userId: userId,
+                        name: characterData.name,
+                        class: characterData.class,
+                        avatar: characterData.avatar || '👤',
+                        created: new Date().toISOString(),
+                    };
+                    
+                    if (!db.characters) db.characters = [];
+                    db.characters.push(newCharacter);
+                    
+                    if (this.saveDatabase(db)) {
+                        return { 
+                            success: true, 
+                            message: 'Персонаж создан!',
+                            character: newCharacter 
+                        };
+                    } else {
+                        return { success: false, message: 'Ошибка сохранения персонажа' };
+                    }
+                } catch (error) {
+                    console.error('Ошибка создания персонажа:', error);
+                    return { success: false, message: 'Ошибка создания персонажа' };
+                }
             }
             
             // Удалить персонажа
             deleteCharacter(charId) {
-                const db = this.getDatabase();
-                const charIndex = db.characters?.findIndex(char => char.id === charId);
-                
-                if (charIndex === -1 || charIndex === undefined) {
-                    return { success: false, message: 'Персонаж не найден' };
+                if (!this.storageAvailable) {
+                    return { success: false, message: 'Хранилище недоступно' };
                 }
                 
-                const deletedChar = db.characters[charIndex];
-                db.characters.splice(charIndex, 1);
-                this.saveDatabase(db);
-                
-                return { 
-                    success: true, 
-                    message: 'Персонаж удален!',
-                    character: deletedChar
-                };
+                try {
+                    const db = this.getDatabase();
+                    const charIndex = db.characters?.findIndex(char => char.id === charId);
+                    
+                    if (charIndex === -1 || charIndex === undefined) {
+                        return { success: false, message: 'Персонаж не найден' };
+                    }
+                    
+                    const deletedChar = db.characters[charIndex];
+                    db.characters.splice(charIndex, 1);
+                    
+                    if (this.saveDatabase(db)) {
+                        return { 
+                            success: true, 
+                            message: 'Персонаж удален!',
+                            character: deletedChar
+                        };
+                    } else {
+                        return { success: false, message: 'Ошибка сохранения после удаления' };
+                    }
+                } catch (error) {
+                    console.error('Ошибка удаления персонажа:', error);
+                    return { success: false, message: 'Ошибка удаления персонажа' };
+                }
             }
             
             // Получить выбранного персонажа пользователя
             getUserSelectedCharacter(userId) {
-                const selectedCharId = localStorage.getItem(`selected_char_${userId}`);
-                if (selectedCharId) {
-                    return this.getCharacterById(parseInt(selectedCharId));
+                if (!this.storageAvailable) {
+                    return { success: false, message: 'Хранилище недоступно' };
                 }
-                return { success: false, message: 'Персонаж не выбран' };
+                
+                try {
+                    const selectedCharId = localStorage.getItem(`selected_char_${userId}`);
+                    if (selectedCharId) {
+                        return this.getCharacterById(parseInt(selectedCharId));
+                    }
+                    return { success: false, message: 'Персонаж не выбран' };
+                } catch (error) {
+                    console.error('Ошибка получения выбранного персонажа:', error);
+                    return { success: false, message: 'Ошибка получения выбранного персонажа' };
+                }
             }
             
             // Установить выбранного персонажа
             setUserSelectedCharacter(userId, charId) {
-                localStorage.setItem(`selected_char_${userId}`, charId);
-                return { success: true };
+                if (!this.storageAvailable) {
+                    return { success: false, message: 'Хранилище недоступно' };
+                }
+                
+                try {
+                    localStorage.setItem(`selected_char_${userId}`, charId);
+                    return { success: true };
+                } catch (error) {
+                    console.error('Ошибка установки выбранного персонажа:', error);
+                    return { success: false, message: 'Ошибка установки выбранного персонажа' };
+                }
             }
             
             // Очистить выбранного персонажа
             clearUserSelectedCharacter(userId) {
-                localStorage.removeItem(`selected_char_${userId}`);
-                return { success: true };
+                if (!this.storageAvailable) {
+                    return { success: false, message: 'Хранилище недоступно' };
+                }
+                
+                try {
+                    localStorage.removeItem(`selected_char_${userId}`);
+                    return { success: true };
+                } catch (error) {
+                    console.error('Ошибка очистки выбранного персонажа:', error);
+                    return { success: false, message: 'Ошибка очистки выбранного персонажа' };
+                }
             }
             
             // ===== АДМИНИСТРАТИВНЫЕ ФУНКЦИИ =====
             
             // Получить статистику базы данных
             getDatabaseStats() {
-                const db = this.getDatabase();
-                const dbSize = JSON.stringify(db).length;
+                if (!this.storageAvailable) {
+                    return {
+                        users: 0,
+                        characters: 0,
+                        dbSize: '0 KB',
+                        lastBackup: 'Недоступно'
+                    };
+                }
                 
-                return {
-                    users: db.users.length,
-                    characters: db.characters.length,
-                    dbSize: (dbSize / 1024).toFixed(2) + ' KB',
-                    lastBackup: localStorage.getItem('last_backup_time') || 'Никогда'
-                };
+                try {
+                    const db = this.getDatabase();
+                    const dbSize = JSON.stringify(db).length;
+                    
+                    return {
+                        users: db.users.length,
+                        characters: db.characters.length,
+                        dbSize: (dbSize / 1024).toFixed(2) + ' KB',
+                        lastBackup: localStorage.getItem('last_backup_time') || 'Никогда'
+                    };
+                } catch (error) {
+                    console.error('Ошибка получения статистики:', error);
+                    return {
+                        users: 0,
+                        characters: 0,
+                        dbSize: '0 KB',
+                        lastBackup: 'Ошибка'
+                    };
+                }
             }
             
             // Экспорт базы данных в JSON
@@ -1278,6 +1610,10 @@
             
             // Импорт базы данных из JSON
             importDatabase(jsonData) {
+                if (!this.storageAvailable) {
+                    return { success: false, message: 'Хранилище недоступно' };
+                }
+                
                 try {
                     const newDb = JSON.parse(jsonData);
                     
@@ -1285,18 +1621,20 @@
                         return { success: false, message: 'Неверный формат базы данных' };
                     }
                     
-                    this.saveDatabase(newDb);
-                    
-                    localStorage.setItem('last_backup_time', new Date().toISOString());
-                    
-                    return { 
-                        success: true, 
-                        message: 'База данных успешно загружена!',
-                        stats: {
-                            users: newDb.users.length,
-                            characters: newDb.characters.length
-                        }
-                    };
+                    if (this.saveDatabase(newDb)) {
+                        localStorage.setItem('last_backup_time', new Date().toISOString());
+                        
+                        return { 
+                            success: true, 
+                            message: 'База данных успешно загружена!',
+                            stats: {
+                                users: newDb.users.length,
+                                characters: newDb.characters.length
+                            }
+                        };
+                    } else {
+                        return { success: false, message: 'Ошибка сохранения базы данных' };
+                    }
                 } catch (error) {
                     return { 
                         success: false, 
@@ -1307,98 +1645,203 @@
             
             // Сброс базы данных к начальному состоянию
             resetDatabase() {
-                localStorage.removeItem(this.dbName);
-                this.init();
-                
-                const keysToRemove = [];
-                for (let i = 0; i < localStorage.length; i++) {
-                    const key = localStorage.key(i);
-                    if (key.startsWith('selected_char_') || 
-                        key === 'currentUser' || 
-                        key === 'activeCharacter' ||
-                        key === 'newlyCreatedCharacter') {
-                        keysToRemove.push(key);
-                    }
+                if (!this.storageAvailable) {
+                    return { success: false, message: 'Хранилище недоступно' };
                 }
                 
-                keysToRemove.forEach(key => localStorage.removeItem(key));
-                
-                return { 
-                    success: true, 
-                    message: 'База данных сброшена к начальному состоянию!' 
-                };
+                try {
+                    localStorage.removeItem(this.dbName);
+                    this.init();
+                    
+                    const keysToRemove = [];
+                    for (let i = 0; i < localStorage.length; i++) {
+                        const key = localStorage.key(i);
+                        if (key && (key.startsWith('selected_char_') || 
+                            key === 'currentUser' || 
+                            key === 'activeCharacter' ||
+                            key === 'newlyCreatedCharacter')) {
+                            keysToRemove.push(key);
+                        }
+                    }
+                    
+                    keysToRemove.forEach(key => localStorage.removeItem(key));
+                    
+                    return { 
+                        success: true, 
+                        message: 'База данных сброшена к начальному состоянию!' 
+                    };
+                } catch (error) {
+                    console.error('Ошибка сброса БД:', error);
+                    return { success: false, message: 'Ошибка сброса базы данных' };
+                }
             }
             
             // Удалить всех пользователей (кроме администратора)
             deleteAllUsers() {
-                const db = this.getDatabase();
-                
-                const adminUsers = db.users.filter(u => u.username === 'admin' || u.isAdmin || u.isAssistant);
-                
-                db.users = adminUsers;
-                db.nextId = Math.max(...adminUsers.map(u => u.id), 2) + 1;
-                db.characters = db.characters.filter(char => adminUsers.some(u => u.id === char.userId));
-                db.nextCharId = db.characters.length > 0 ? Math.max(...db.characters.map(c => c.id)) + 1 : 1;
-                
-                this.saveDatabase(db);
-                
-                const keysToRemove = [];
-                for (let i = 0; i < localStorage.length; i++) {
-                    const key = localStorage.key(i);
-                    if (key.startsWith('selected_char_') || 
-                        key === 'currentUser' || 
-                        key === 'activeCharacter' ||
-                        key === 'newlyCreatedCharacter') {
-                        keysToRemove.push(key);
-                    }
+                if (!this.storageAvailable) {
+                    return { success: false, message: 'Хранилище недоступно' };
                 }
                 
-                keysToRemove.forEach(key => {
-                    const userId = key.replace('selected_char_', '');
-                    if (userId && !adminUsers.some(u => u.id === parseInt(userId))) {
-                        localStorage.removeItem(key);
+                try {
+                    const db = this.getDatabase();
+                    
+                    const adminUsers = db.users.filter(u => u.username === 'admin' || u.isAdmin || u.isAssistant);
+                    
+                    db.users = adminUsers;
+                    db.nextId = adminUsers.length > 0 ? Math.max(...adminUsers.map(u => u.id), 2) + 1 : 2;
+                    db.characters = db.characters.filter(char => adminUsers.some(u => u.id === char.userId));
+                    db.nextCharId = db.characters.length > 0 ? Math.max(...db.characters.map(c => c.id)) + 1 : 1;
+                    
+                    if (this.saveDatabase(db)) {
+                        const keysToRemove = [];
+                        for (let i = 0; i < localStorage.length; i++) {
+                            const key = localStorage.key(i);
+                            if (key && key.startsWith('selected_char_')) {
+                                const userId = parseInt(key.replace('selected_char_', ''));
+                                if (!adminUsers.some(u => u.id === userId)) {
+                                    keysToRemove.push(key);
+                                }
+                            }
+                        }
+                        
+                        keysToRemove.forEach(key => localStorage.removeItem(key));
+                        
+                        return { 
+                            success: true, 
+                            message: 'Все пользователи удалены (кроме администраторов и ассистентов)!',
+                            stats: {
+                                users: db.users.length,
+                                characters: db.characters.length
+                            }
+                        };
+                    } else {
+                        return { success: false, message: 'Ошибка сохранения после удаления' };
                     }
-                });
-                
-                return { 
-                    success: true, 
-                    message: 'Все пользователи удалены (кроме администраторов и ассистентов)!',
-                    stats: {
-                        users: db.users.length,
-                        characters: db.characters.length
-                    }
-                };
+                } catch (error) {
+                    console.error('Ошибка удаления пользователей:', error);
+                    return { success: false, message: 'Ошибка удаления пользователей' };
+                }
             }
             
             // Создать резервную копию
             createBackup() {
-                const db = this.getDatabase();
-                const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-                const backupKey = `backup_${timestamp}`;
+                if (!this.storageAvailable) {
+                    return { success: false, message: 'Хранилище недоступно' };
+                }
                 
-                localStorage.setItem(backupKey, JSON.stringify(db));
+                try {
+                    const db = this.getDatabase();
+                    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+                    const backupKey = `backup_${timestamp}`;
+                    
+                    localStorage.setItem(backupKey, JSON.stringify(db));
+                    
+                    // Ограничиваем количество бэкапов до 5
+                    const backups = [];
+                    for (let i = 0; i < localStorage.length; i++) {
+                        const key = localStorage.key(i);
+                        if (key && key.startsWith('backup_')) {
+                            backups.push(key);
+                        }
+                    }
+                    
+                    if (backups.length > 5) {
+                        backups.sort();
+                        for (let i = 0; i < backups.length - 5; i++) {
+                            localStorage.removeItem(backups[i]);
+                        }
+                    }
+                    
+                    return { 
+                        success: true, 
+                        message: 'Резервная копия создана!',
+                        backupKey: backupKey
+                    };
+                } catch (error) {
+                    console.error('Ошибка создания бэкапа:', error);
+                    return { success: false, message: 'Ошибка создания резервной копии' };
+                }
+            }
+        }
+        
+        // ===== ФУНКЦИИ ОТЛАДКИ =====
+        
+        function debugMobileStorage() {
+            const debugInfo = {
+                timestamp: new Date().toISOString(),
+                userAgent: navigator.userAgent,
+                platform: navigator.platform,
+                localStorage: {
+                    available: false,
+                    length: 0,
+                    quota: 'unknown'
+                },
+                cookies: {
+                    enabled: navigator.cookieEnabled
+                },
+                screen: {
+                    width: window.screen.width,
+                    height: window.screen.height,
+                    availWidth: window.screen.availWidth,
+                    availHeight: window.screen.availHeight
+                },
+                connection: navigator.connection ? {
+                    type: navigator.connection.effectiveType,
+                    downlink: navigator.connection.downlink
+                } : 'unknown'
+            };
+            
+            try {
+                localStorage.setItem('debug_test', 'test');
+                localStorage.getItem('debug_test');
+                localStorage.removeItem('debug_test');
+                debugInfo.localStorage.available = true;
+                debugInfo.localStorage.length = localStorage.length;
                 
-                const backups = [];
+                // Примерная оценка квоты
+                let totalSize = 0;
                 for (let i = 0; i < localStorage.length; i++) {
                     const key = localStorage.key(i);
-                    if (key.startsWith('backup_')) {
-                        backups.push(key);
+                    if (key) {
+                        const value = localStorage.getItem(key);
+                        totalSize += (key.length + (value ? value.length : 0)) * 2; // примерный размер в байтах
                     }
                 }
+                debugInfo.localStorage.quota = (totalSize / 1024).toFixed(2) + ' KB used';
                 
-                if (backups.length > 5) {
-                    backups.sort();
-                    for (let i = 0; i < backups.length - 5; i++) {
-                        localStorage.removeItem(backups[i]);
-                    }
-                }
-                
-                return { 
-                    success: true, 
-                    message: 'Резервная копия создана!',
-                    backupKey: backupKey
-                };
+            } catch (e) {
+                debugInfo.localStorage.error = e.toString();
             }
+            
+            console.log('📱 Mobile Debug Info:', debugInfo);
+            
+            // Показываем информацию в debug панели
+            const debugPanel = document.getElementById('debugPanel');
+            const debugContent = document.getElementById('debugContent');
+            
+            if (debugPanel && debugContent) {
+                debugContent.innerHTML = JSON.stringify(debugInfo, null, 2);
+                debugPanel.classList.add('show');
+            }
+            
+            // Показываем краткую информацию в основном сообщении
+            const messageEl = document.getElementById('message');
+            if (messageEl) {
+                const storageStatus = debugInfo.localStorage.available ? '✅' : '❌';
+                const cookieStatus = debugInfo.cookies.enabled ? '✅' : '❌';
+                messageEl.textContent = `📱 Отладка: Storage ${storageStatus}, Cookies ${cookieStatus}`;
+                messageEl.className = 'message info';
+                
+                setTimeout(() => {
+                    messageEl.className = 'message';
+                }, 5000);
+            }
+            
+            return debugInfo;
+        }
+        
+        function hideDebugPanel() {
+            document.getElementById('debugPanel').classList.remove('show');
         }
         
         // ===== УПРАВЛЕНИЕ ИНТЕРФЕЙСОМ =====
@@ -1415,7 +1858,7 @@
             
             setTimeout(() => {
                 messageEl.className = 'message';
-            }, 3000);
+            }, 5000);
         }
         
         function showConsoleMessage(text, type = 'info') {
@@ -1438,7 +1881,7 @@
             
             const navItems = [
                 {
-                    href: 'index.html',
+                    href: '#',
                     icon: '👤',
                     title: 'Мой аккаунт',
                     desc: 'Управление профилем и персонажами',
@@ -1446,7 +1889,7 @@
                     isAdminOnly: false
                 },
                 {
-                    href: 'create-character.html',
+                    href: '#',
                     icon: '🎨',
                     title: 'Создание персонажа',
                     desc: 'Создание и редактирование персонажей',
@@ -1454,7 +1897,7 @@
                     isAdminOnly: false
                 },
                 {
-                    href: 'game-world.html',
+                    href: '#',
                     icon: '🎮',
                     title: 'Игровой мир',
                     desc: 'Приключения с вашим персонажем',
@@ -1475,6 +1918,23 @@
                     <div class="nav-card-title">${item.title}</div>
                     <div class="nav-card-desc">${item.desc}</div>
                 `;
+                
+                // Для мобильных устройств добавляем обработчик касания
+                navCard.addEventListener('touchstart', function(e) {
+                    e.preventDefault();
+                    this.style.transform = 'scale(0.95)';
+                });
+                
+                navCard.addEventListener('touchend', function(e) {
+                    e.preventDefault();
+                    this.style.transform = '';
+                    showMessage('Функция в разработке', 'info');
+                });
+                
+                navCard.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    showMessage('Функция в разработке', 'info');
+                });
                 
                 navGrid.appendChild(navCard);
             });
@@ -1539,7 +1999,11 @@
             loadUserCharacters();
             loadSelectedCharacter();
             
-            localStorage.setItem('currentUser', JSON.stringify(user));
+            try {
+                localStorage.setItem('currentUser', JSON.stringify(user));
+            } catch (e) {
+                console.error('Ошибка сохранения сессии:', e);
+            }
             
             updateConsoleStats();
         }
@@ -1547,7 +2011,11 @@
         function hideUserPanel() {
             document.getElementById('userPanel').classList.remove('show');
             document.getElementById('authForm').style.display = 'block';
-            localStorage.removeItem('currentUser');
+            try {
+                localStorage.removeItem('currentUser');
+            } catch (e) {
+                console.error('Ошибка удаления сессии:', e);
+            }
             currentUser = null;
             selectedCharacter = null;
             isConsoleVisible = false;
@@ -1564,14 +2032,25 @@
                 return;
             }
             
-            const result = db.loginUser(username, password);
+            // Блокируем кнопку на время выполнения
+            const loginBtn = document.querySelector('.login-btn');
+            const originalText = loginBtn.textContent;
+            loginBtn.textContent = '⏳ Вход...';
+            loginBtn.disabled = true;
             
-            if (result.success) {
-                showMessage('✅ Вход выполнен успешно!', 'success');
-                showUserPanel(result.user);
-            } else {
-                showMessage(`❌ ${result.message}`, 'error');
-            }
+            setTimeout(() => {
+                const result = db.loginUser(username, password);
+                
+                if (result.success) {
+                    showMessage('✅ Вход выполнен успешно!', 'success');
+                    showUserPanel(result.user);
+                } else {
+                    showMessage(`❌ ${result.message}`, 'error');
+                }
+                
+                loginBtn.textContent = originalText;
+                loginBtn.disabled = false;
+            }, 300); // Небольшая задержка для мобильных устройств
         }
         
         function register() {
@@ -1593,19 +2072,39 @@
                 return;
             }
             
-            const result = db.registerUser(username, password);
+            // Блокируем кнопку на время выполнения
+            const registerBtn = document.querySelector('.register-btn');
+            const originalText = registerBtn.textContent;
+            registerBtn.textContent = '⏳ Регистрация...';
+            registerBtn.disabled = true;
             
-            if (result.success) {
-                showMessage(`✅ ${result.message}`, 'success');
-                document.getElementById('username').value = '';
-                document.getElementById('password').value = '';
-                
-                setTimeout(() => {
-                    showUserPanel(result.user);
-                }, 1000);
-            } else {
-                showMessage(`❌ ${result.message}`, 'error');
-            }
+            setTimeout(() => {
+                try {
+                    const result = db.registerUser(username, password);
+                    
+                    if (result.success) {
+                        showMessage(`✅ ${result.message}`, 'success');
+                        document.getElementById('username').value = '';
+                        document.getElementById('password').value = '';
+                        
+                        setTimeout(() => {
+                            showUserPanel(result.user);
+                        }, 1000);
+                    } else {
+                        showMessage(`❌ ${result.message}`, 'error');
+                        // Запускаем отладку при ошибке
+                        if (/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+                            debugMobileStorage();
+                        }
+                    }
+                } catch (error) {
+                    showMessage(`❌ Ошибка: ${error.message}`, 'error');
+                    debugMobileStorage();
+                } finally {
+                    registerBtn.textContent = originalText;
+                    registerBtn.disabled = false;
+                }
+            }, 300);
         }
         
         function logout() {
@@ -1708,6 +2207,8 @@
             if (result.success) {
                 loadSelectedCharacter();
                 showMessage('✅ Персонаж выбран!', 'success');
+            } else {
+                showMessage(`❌ ${result.message}`, 'error');
             }
         }
         
@@ -1723,6 +2224,8 @@
                 document.querySelectorAll('.character-card').forEach(card => {
                     card.classList.remove('selected');
                 });
+            } else {
+                showMessage(`❌ ${result.message}`, 'error');
             }
         }
         
@@ -1746,7 +2249,7 @@
         }
         
         function createNewCharacter() {
-            window.location.href = 'create-character.html';
+            showMessage('Функция создания персонажа в разработке', 'info');
         }
         
         function playWithSelectedCharacter() {
@@ -1755,8 +2258,13 @@
                 return;
             }
             
-            localStorage.setItem('activeCharacter', JSON.stringify(selectedCharacter));
-            window.location.href = 'game-world.html';
+            try {
+                localStorage.setItem('activeCharacter', JSON.stringify(selectedCharacter));
+                showMessage('🎮 Запуск игры...', 'success');
+            } catch (e) {
+                console.error('Ошибка сохранения персонажа:', e);
+                showMessage('❌ Ошибка запуска игры', 'error');
+            }
         }
         
         // ===== КОНСОЛЬ АДМИНИСТРАТОРА/АССИСТЕНТА =====
@@ -1909,6 +2417,8 @@
                 updateConsoleStats();
                 
                 logout();
+            } else {
+                showConsoleMessage(`❌ ${result.message}`, 'error');
             }
         }
         
@@ -1939,25 +2449,31 @@
                     loadUserCharacters();
                     loadSelectedCharacter();
                 }
+            } else {
+                showConsoleMessage(`❌ ${result.message}`, 'error');
             }
         }
         
         function restoreSession() {
-            const savedUser = localStorage.getItem('currentUser');
-            
-            if (savedUser) {
-                try {
-                    const user = JSON.parse(savedUser);
-                    const userCheck = db.getUserById(user.id);
-                    
-                    if (userCheck.success) {
-                        showUserPanel(userCheck.user);
-                    } else {
+            try {
+                const savedUser = localStorage.getItem('currentUser');
+                
+                if (savedUser) {
+                    try {
+                        const user = JSON.parse(savedUser);
+                        const userCheck = db.getUserById(user.id);
+                        
+                        if (userCheck.success) {
+                            showUserPanel(userCheck.user);
+                        } else {
+                            localStorage.removeItem('currentUser');
+                        }
+                    } catch (e) {
                         localStorage.removeItem('currentUser');
                     }
-                } catch (e) {
-                    localStorage.removeItem('currentUser');
                 }
+            } catch (e) {
+                console.error('Ошибка восстановления сессии:', e);
             }
         }
         
@@ -1965,6 +2481,12 @@
         window.addEventListener('load', function() {
             updateNavigationPanel(false);
             restoreSession();
+            
+            // Отладка для мобильных устройств
+            if (/Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+                console.log('📱 Мобильное устройство обнаружено');
+                setTimeout(debugMobileStorage, 1000);
+            }
             
             const usernameInput = document.getElementById('username');
             const passwordInput = document.getElementById('password');
@@ -1979,6 +2501,23 @@
             
             usernameInput.addEventListener('keypress', handleEnterKey);
             passwordInput.addEventListener('keypress', handleEnterKey);
+            
+            // Для мобильных устройств добавляем обработку touch-событий
+            if ('ontouchstart' in window) {
+                document.querySelectorAll('button, .nav-card, .character-card').forEach(el => {
+                    el.addEventListener('touchstart', function(e) {
+                        e.preventDefault();
+                    }, { passive: false });
+                });
+            }
+        });
+        
+        // Обработка ошибок для мобильных устройств
+        window.addEventListener('error', function(e) {
+            console.error('Глобальная ошибка:', e.error);
+            if (/Mobi|Android|iPhone/i.test(navigator.userAgent)) {
+                showMessage('Произошла ошибка. Проверьте консоль.', 'error');
+            }
         });
     </script>
 </body>
