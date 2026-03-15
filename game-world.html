@@ -912,20 +912,54 @@
         }
         
         // ========== ЗАГРУЗКА ПЕРСОНАЖА ==========
-        function loadActiveCharacter() {
-            const savedCharacter = localStorage.getItem('activeCharacter');
-            if (savedCharacter) {
-                try {
-                    activeCharacter = JSON.parse(savedCharacter);
-                    console.log('✅ Персонаж загружен:', activeCharacter.name);
-                    
-                } catch (e) {
-                    console.error('❌ Ошибка загрузки персонажа:', e);
+// В game-world.html замените функцию loadActiveCharacter
+async function loadActiveCharacter() {
+    const savedCharacter = localStorage.getItem('activeCharacter');
+    if (savedCharacter) {
+        try {
+            const localChar = JSON.parse(savedCharacter);
+            
+            // Загружаем актуальные данные из базы
+            const response = await fetch('db.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    action: 'get',
+                    characterId: localChar.id
+                })
+            });
+            
+            const serverChar = await response.json();
+            
+            if (serverChar) {
+                activeCharacter = serverChar;
+                // Обновляем localStorage
+                localStorage.setItem('activeCharacter', JSON.stringify(serverChar));
+                
+                // Загружаем статистику из базы
+                if (serverChar.stats) {
+                    characterStats = serverChar.stats;
+                } else {
+                    loadCharacterStats();
                 }
             } else {
-                showNotification('Персонаж не найден', 'Пожалуйста, выберите персонажа', '❌');
+                activeCharacter = localChar;
+                loadCharacterStats();
             }
+            
+        } catch (e) {
+            console.error('Ошибка загрузки персонажа:', e);
+            activeCharacter = JSON.parse(savedCharacter);
+            loadCharacterStats();
         }
+    } else {
+        showNotification('Персонаж не найден', 'Пожалуйста, выберите персонажа', '❌');
+        setTimeout(() => window.location.href = 'index.html', 2000);
+    }
+}
+        
         
         function loadCharacterStats() {
             if (!activeCharacter || !activeCharacter.id) {
@@ -1281,7 +1315,31 @@
                 showNotification('💪 Сила', 'Каждые 10 очков силы = +1 уровень. Влияет на заработок и макс. энергию!', 'ℹ️');
             }
         }
-        
+        // Добавьте эту функцию в game-world.html
+async function saveCharacterStats() {
+    if (!activeCharacter || !activeCharacter.id) return;
+    
+    // Сохраняем локально
+    const statsKey = `characterStats_${activeCharacter.id}`;
+    localStorage.setItem(statsKey, JSON.stringify(characterStats));
+    
+    // Сохраняем на сервер
+    try {
+        await fetch('db.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                action: 'updateStats',
+                characterId: activeCharacter.id,
+                stats: characterStats
+            })
+        });
+    } catch (e) {
+        console.error('Ошибка сохранения на сервер:', e);
+    }
+}
         function simulateBusinessIncome() {
             if (!characterStats.business) return;
             
@@ -1336,4 +1394,4 @@
         });
     </script>
 </body>
-</html>
+</html>16016
